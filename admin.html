@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>CraftGlitch — Gestione addon</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Pixelify+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07040f;--panel:#151027;--panel2:#1d1733;--slot:#0f0a1f;--line:#2e2452;
+  --cyan:#19e6ff;--mag:#e43bff;--vio:#7a2bff;--green:#3ddc66;--red:#ff4d6d;--yellow:#ffff55;
+  --ink:#f4f1ff;--muted:#aba2cf;
+  --px:"Pixelify Sans",ui-monospace,monospace;--body:"Chakra Petch",system-ui,sans-serif;
+  color-scheme:dark;box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5}
+:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+.wrap{width:min(1000px,100% - 28px);margin-inline:auto}
+h1,h2,h3{font-family:var(--px);margin:0;line-height:1.1}
+[hidden]{display:none!important}
+
+.btn{--b:#3a3358;--bd:#211c38;display:inline-flex;align-items:center;justify-content:center;gap:8px;font:600 17px/1 var(--px);color:#fff;
+  background:var(--b);border:2px solid #000;padding:12px 18px 15px;cursor:pointer;text-decoration:none;white-space:nowrap;
+  box-shadow:inset 0 -4px 0 var(--bd),inset 0 2px 0 rgba(255,255,255,.25)}
+.btn:hover{filter:brightness(1.15)}
+.btn:active{box-shadow:inset 0 -1px 0 var(--bd)}
+.btn:disabled{opacity:.5;cursor:wait}
+.btn.green{--b:#3c8527;--bd:#1d4d13}
+.btn.red{--b:#a12037;--bd:#5a0f1d}
+.btn.big{font-size:20px;padding:15px 24px 18px}
+.btn.sm{font-size:15px;padding:8px 12px 11px}
+.btn.full{width:100%}
+
+input,textarea{width:100%;font:500 17px var(--body);color:var(--ink);background:var(--slot);border:2px solid var(--line);padding:12px 14px;border-radius:0}
+input:focus,textarea:focus{outline:none;border-color:var(--cyan)}
+textarea{resize:vertical;min-height:90px}
+label.lbl{display:block;font-weight:700;margin-bottom:6px}
+.help{display:block;font-weight:400;color:var(--muted);font-size:14px;margin-top:2px}
+.field{margin-bottom:18px}
+.field:last-child{margin-bottom:0}
+.err{color:var(--red);font-size:15px;min-height:22px;margin:6px 0 10px}
+.slot{width:64px;height:64px;flex:none;display:grid;place-items:center;font-size:32px;background:var(--slot);box-shadow:inset 3px 3px 0 #000,inset -3px -3px 0 #3a2f60}
+.slot img{width:78%;height:78%;object-fit:contain;image-rendering:pixelated}
+.cube{width:1em;height:1em;vertical-align:-.12em}
+
+/* login */
+#login{min-height:100vh;display:grid;place-items:center;padding:24px}
+#login form{width:min(420px,100%);padding:32px;background:var(--panel);border:3px solid #000;box-shadow:inset 3px 3px 0 #3b2f66}
+#login img{width:96px;margin:0 auto 14px;display:block}
+#login h1{text-align:center;font-size:28px;margin-bottom:8px}
+#login p{text-align:center;color:var(--muted);margin:0 0 24px}
+.linkbtn{display:block;margin:14px auto 0;background:none;border:0;color:var(--muted);font:500 15px var(--body);cursor:pointer;text-decoration:underline}
+
+/* top bar */
+.top{position:sticky;top:0;z-index:10;background:rgba(7,4,15,.92);backdrop-filter:blur(8px);border-bottom:2px solid #000}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;height:64px;gap:10px}
+.top .brand{display:flex;align-items:center;gap:10px;font:700 20px var(--px)}
+.top img{width:36px}
+.top .acts{display:flex;gap:8px}
+
+/* list view */
+.page{padding:28px 0 120px}
+.page-head{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:22px}
+.page-head h1{font-size:34px}
+.page-head p{margin:4px 0 0;color:var(--muted)}
+.cards{display:grid;gap:12px}
+.card{display:flex;align-items:center;gap:16px;padding:14px 16px;background:var(--panel);border:3px solid #000;border-left:6px solid var(--c,var(--cyan))}
+.card.off{opacity:.6}
+.card .info{flex:1;min-width:0}
+.card h3{font-size:22px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card .meta{display:flex;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:14px;margin-top:4px}
+.card .meta b{color:var(--ink)}
+.tag{font:600 12px var(--px);padding:2px 7px;background:var(--yellow);color:#2b2b00}
+.tag.off{background:#555;color:#fff}
+.card .price{font:700 22px var(--px);white-space:nowrap}
+.card .price.free{color:var(--green)}
+.card .acts{display:flex;gap:6px;align-items:center}
+.iconbtn{width:40px;height:40px;display:grid;place-items:center;background:var(--slot);border:2px solid #000;color:var(--muted);cursor:pointer;font-size:16px}
+.iconbtn:hover{color:var(--ink);border-color:var(--cyan)}
+.iconbtn:disabled{opacity:.25;cursor:default;border-color:#000}
+.iconbtn.del:hover{color:var(--red);border-color:var(--red)}
+@media(max-width:700px){
+  .card{flex-wrap:wrap}
+  .card .info{flex-basis:calc(100% - 82px)}
+  .card .price{order:3;flex:1}
+  .card .acts{order:4}
+}
+.empty{text-align:center;padding:48px 24px;background:var(--panel);border:3px dashed var(--line)}
+.empty h2{font-size:26px;margin-bottom:8px}
+.empty p{color:var(--muted);margin:0 0 22px}
+.empty .row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+
+/* editor */
+.back{background:none;border:0;color:var(--muted);font:600 16px var(--body);cursor:pointer;padding:0;margin-bottom:12px}
+.back:hover{color:var(--cyan)}
+.sec{background:var(--panel);border:3px solid #000;padding:22px;margin-bottom:16px}
+.sec>h2{font-size:22px;margin-bottom:4px;display:flex;align-items:center;gap:10px}
+.sec>h2 .n{width:30px;height:30px;display:grid;place-items:center;font-size:17px;background:var(--yellow);color:#2b2b00;border:2px solid #000}
+.sec>p.help{margin:0 0 18px}
+.icon-pick{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.icon-pick .slot{width:96px;height:96px;font-size:48px}
+.icon-pick .opts{flex:1;min-width:220px}
+.emojis{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.emojis button{width:42px;height:42px;font-size:22px;background:var(--slot);border:2px solid #000;cursor:pointer}
+.emojis button:hover,.emojis button[aria-pressed="true"]{border-color:var(--cyan)}
+.choice{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+.choice button{padding:18px;background:var(--slot);border:3px solid var(--line);color:var(--ink);font:700 20px var(--px);cursor:pointer;text-align:left}
+.choice button small{display:block;font:400 14px var(--body);color:var(--muted);margin-top:4px}
+.choice button[aria-pressed="true"]{border-color:var(--green);background:#12261a}
+.choice button[aria-pressed="true"]:last-child{border-color:var(--mag);background:#2a1033}
+.price-in{display:flex;align-items:center;gap:10px;max-width:260px}
+.price-in .cube{width:36px;height:36px;flex:none}
+.price-in input{font:700 24px var(--px)}
+.drop{display:grid;place-items:center;text-align:center;gap:6px;padding:30px 20px;border:3px dashed var(--line);background:var(--slot);cursor:pointer;transition:border-color .15s}
+.drop:hover,.drop.over{border-color:var(--cyan)}
+.drop b{font:700 20px var(--px)}
+.drop span{color:var(--muted);font-size:14px}
+.drop .plus{font:700 40px/1 var(--px);color:var(--cyan)}
+.photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:14px}
+.photo{position:relative;aspect-ratio:16/10;background:#000 center/cover;border:3px solid #000}
+.photo .first{position:absolute;left:6px;top:6px;font:600 12px var(--px);background:var(--yellow);color:#2b2b00;padding:2px 6px}
+.photo .pacts{position:absolute;right:4px;bottom:4px;display:flex;gap:4px}
+.photo .pacts button{width:32px;height:32px;background:rgba(0,0,0,.8);border:2px solid #000;color:#fff;cursor:pointer;font-size:14px}
+.photo .pacts button:hover{background:var(--cyan);color:#000}
+.photo .pacts button.del:hover{background:var(--red)}
+.photo.loading{display:grid;place-items:center;color:var(--muted);font-size:14px;background:var(--slot)}
+.switch{display:flex;align-items:center;gap:14px;cursor:pointer;font-weight:700}
+.switch input{position:absolute;opacity:0;width:1px;height:1px}
+.switch .tr{width:56px;height:30px;background:#3a3358;border:2px solid #000;position:relative;flex:none;transition:.15s}
+.switch .tr::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;background:#fff;transition:.15s}
+.switch input:checked+.tr{background:var(--green)}
+.switch input:checked+.tr::after{left:29px}
+.switch input:focus-visible+.tr{outline:3px solid var(--yellow);outline-offset:2px}
+details.more{background:var(--panel);border:3px solid #000;margin-bottom:16px}
+details.more summary{cursor:pointer;padding:18px 22px;font:700 20px var(--px);list-style:none;display:flex;justify-content:space-between}
+details.more summary::-webkit-details-marker{display:none}
+details.more summary::after{content:"+";color:var(--yellow)}
+details.more[open] summary::after{content:"−"}
+details.more .in{padding:0 22px 22px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:600px){.two,.choice{grid-template-columns:1fr}}
+.colors{display:flex;gap:8px}
+.colors button{width:44px;height:44px;border:3px solid #000;cursor:pointer}
+.colors button[aria-pressed="true"]{outline:3px solid #fff;outline-offset:2px}
+.savebar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:rgba(7,4,15,.95);border-top:2px solid #000;padding:12px 0 calc(12px + env(safe-area-inset-bottom,0px))}
+.savebar .wrap{display:flex;gap:10px;justify-content:flex-end;align-items:center}
+.savebar .msg{flex:1;color:var(--red);font-size:15px}
+
+.toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom,0px));translate:-50% 20px;z-index:60;opacity:0;transition:.25s;pointer-events:none;
+  background:var(--green);color:#002b0c;border:2px solid #000;font:700 17px var(--px);padding:12px 20px;max-width:calc(100% - 24px)}
+.toast.bad{background:var(--red);color:#fff}
+.toast.show{opacity:1;translate:-50% 0}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="cube" viewBox="0 0 16 16">
+    <polygon points="8,1 15,4.5 8,8 1,4.5" fill="#9ff8ff"/><polygon points="1,4.5 8,8 8,15 1,11.5" fill="#22c9df"/>
+    <polygon points="8,8 15,4.5 15,11.5 8,15" fill="#0f8396"/><rect x="6" y="3" width="2" height="1" fill="#fff"/>
+    <polygon points="8,1 15,4.5 15,11.5 8,15 1,11.5 1,4.5" fill="none" stroke="#052a31" stroke-width=".8"/>
+  </symbol>
+</defs></svg>
+
+<!-- LOGIN -->
+<div id="login">
+  <form id="loginForm">
+    <img src="logo.png" alt="CraftGlitch">
+    <h1 id="lTitle">Gestione addon</h1>
+    <p id="lSub">Caricamento…</p>
+    <div class="field"><label class="lbl" for="lEmail">Email</label><input id="lEmail" type="email" autocomplete="username" required></div>
+    <div class="field"><label class="lbl" for="lPass">Password</label><input id="lPass" type="password" autocomplete="current-password" required minlength="6"></div>
+    <div class="field" id="lPass2Wrap" hidden><label class="lbl" for="lPass2">Ripeti la password</label><input id="lPass2" type="password" autocomplete="new-password" minlength="6"></div>
+    <div class="err" id="lErr" role="alert"></div>
+    <button class="btn green big full" id="lBtn" disabled>Entra</button>
+    <button class="linkbtn" type="button" id="lForgot" hidden>Ho dimenticato la password</button>
+  </form>
+</div>
+
+<!-- APP -->
+<div id="app" hidden>
+  <header class="top">
+    <div class="wrap">
+      <div class="brand"><img src="favicon.png" alt="">CraftGlitch</div>
+      <div class="acts">
+        <a class="btn sm" href="index.html" target="_blank" rel="noopener">Vedi il sito</a>
+        <button class="btn sm" id="logout">Esci</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- LISTA -->
+  <main class="wrap page" id="listView">
+    <div class="page-head">
+      <div><h1>I tuoi addon</h1><p id="summary"></p></div>
+      <button class="btn green big" id="addBtn">+ Nuovo addon</button>
+    </div>
+    <div class="cards" id="cards"><div class="empty"><p>Caricamento…</p></div></div>
+  </main>
+
+  <!-- EDITOR -->
+  <main class="wrap page" id="editView" hidden>
+    <button class="back" type="button" id="backBtn">← Torna alla lista</button>
+    <div class="page-head"><div><h1 id="eTitle">Nuovo addon</h1><p>Scrivi i testi in inglese: il sito è in inglese.</p></div></div>
+
+    <section class="sec">
+      <h2><span class="n">1</span>Nome e icona</h2>
+      <p class="help">L'icona è l'immagine quadrata che si vede nella card.</p>
+      <div class="field"><label class="lbl" for="fName">Nome dell'addon</label><input id="fName" maxlength="40" placeholder="Es. Elevator"></div>
+      <div class="icon-pick">
+        <div class="slot" id="iconPrev">🧩</div>
+        <div class="opts">
+          <button class="btn sm" type="button" id="iconUp">📷 Carica icona (PNG o JPG)</button>
+          <button class="btn sm red" type="button" id="iconDel" hidden>Togli immagine</button>
+          <input type="file" id="iconFile" accept="image/png,image/jpeg" hidden>
+          <span class="help" style="margin-top:8px">Oppure scegli un'emoji:</span>
+          <div class="emojis" id="emojis"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">2</span>Prezzo</h2>
+      <p class="help">Il cliente ti scrive per email: se è gratis gli mandi il link, se è a pagamento prima l'IBAN.</p>
+      <div class="choice" role="group" aria-label="Tipo">
+        <button type="button" id="cFree" aria-pressed="true">Gratis<small>Il cliente riceve subito il link</small></button>
+        <button type="button" id="cPaid" aria-pressed="false">A pagamento<small>Il cliente paga con bonifico</small></button>
+      </div>
+      <div class="field" id="priceWrap" hidden>
+        <label class="lbl" for="fPrice">Quanti cubi costa? <span class="help">1 cubo = 1 €</span></label>
+        <div class="price-in"><svg class="cube"><use href="#cube"/></svg><input id="fPrice" type="text" inputmode="decimal" placeholder="2.99"></div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">3</span>Descrizione</h2>
+      <p class="help">Spiega cosa fa l'addon.</p>
+      <div class="field"><label class="lbl" for="fTagline">Frase breve <span class="help">Si vede nella card. Es: "Move between floors in one jump."</span></label><input id="fTagline" maxlength="90"></div>
+      <div class="field"><label class="lbl" for="fDesc">Descrizione completa <span class="help">Si vede quando il cliente apre l'addon. Lascia una riga vuota per andare a capo.</span></label><textarea id="fDesc" rows="5" maxlength="2000"></textarea></div>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">4</span>Foto e video</h2>
+      <p class="help">Screenshot dell'addon nel gioco. La prima foto è quella principale. Massimo 8.</p>
+      <label class="drop" id="drop" tabindex="0">
+        <span class="plus">+</span><b>Aggiungi foto</b><span>Tocca qui o trascina le immagini · PNG o JPG</span>
+        <input type="file" id="photoFile" accept="image/png,image/jpeg" multiple hidden>
+      </label>
+      <div class="photos" id="photos"></div>
+      <div class="field" style="margin-top:18px"><label class="lbl" for="fVideo">Video YouTube <span class="help">Facoltativo. Incolla il link del video.</span></label><input id="fVideo" type="url" placeholder="https://youtu.be/…"></div>
+    </section>
+
+    <details class="more">
+      <summary>Altri dettagli (facoltativi)</summary>
+      <div class="in">
+        <div class="field"><label class="lbl" for="fFeat">Cosa include <span class="help">Una cosa per riga</span></label><textarea id="fFeat" placeholder="Works in multiplayer&#10;Craftable in survival"></textarea></div>
+        <div class="field"><label class="lbl" for="fHow">Come si usa <span class="help">Un passaggio per riga</span></label><textarea id="fHow" placeholder="Craft the block&#10;Place it on each floor"></textarea></div>
+        <div class="field"><label class="lbl" for="fLog">Novità delle versioni <span class="help">Una per riga, es: 1.1: Added sounds</span></label><textarea id="fLog"></textarea></div>
+        <div class="two">
+          <div class="field"><label class="lbl" for="fVer">Versione addon</label><input id="fVer" placeholder="1.0"></div>
+          <div class="field"><label class="lbl" for="fMc">Versione Minecraft</label><input id="fMc" placeholder="1.21+"></div>
+          <div class="field"><label class="lbl" for="fSize">Peso del file</label><input id="fSize" placeholder="240 KB"></div>
+          <div class="field"><label class="lbl" for="fTag">Etichetta gialla <span class="help">Es. New, Hot</span></label><input id="fTag" maxlength="16"></div>
+        </div>
+        <div class="field"><span class="lbl">Colore della card</span>
+          <div class="colors" id="colors">
+            <button type="button" data-c="cyan" style="background:var(--cyan)" aria-label="Azzurro"></button>
+            <button type="button" data-c="violet" style="background:var(--vio)" aria-label="Viola"></button>
+            <button type="button" data-c="magenta" style="background:var(--mag)" aria-label="Fucsia"></button>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <section class="sec">
+      <label class="switch"><input type="checkbox" id="fVisible" checked><span class="tr"></span><span>Mostra questo addon sul sito</span></label>
+    </section>
+  </main>
+
+  <div class="savebar" id="saveBar" hidden>
+    <div class="wrap">
+      <span class="msg" id="eErr" role="alert"></span>
+      <button class="btn" type="button" id="cancelBtn">Annulla</button>
+      <button class="btn green big" type="button" id="saveBtn">Salva</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, onValue, get, push, set, update, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const _k = ["==QfiI1UChlS2skRzYULHJiOiQWS05WZtVmc1NXY", "l1mIsISM3cDM2Y2Y0IDOhRTZwkDOyU2MxEGM6IWZ", "3pDN4gjN0IjN5ITM0oTMiojIklEcwFmIsICN4gjN", "0IjN5ITM0IiOiQWSyVGZuV2Un5WanF2czVWbiwiI", "t92YuQ3bwNHcwFmLzQTZkVWL09mYvJnblVmcnJiO", "iQXZrNWdCV2ZhJ3b0NnIsIyM0UGZl1CdvJ2by5WZ", "lJ3ZiojIklEdjVmavJHciwiIwBXYuU2chJWY0FGZ", "lNXYiVmcpZmLxQ3cldXLlB3byVXZuIGZ0JXL0xWd", "hZWZk1yM0UGZl1CdvJ2by5WZlJ3Zv8iOzBHd0hmI", "6ICTSVVZzFmYhRXYkJCLi02bj5CcwFWZzFmYlJXa", "m5yM0UGZl1CdvJ2by5WZlJ3ZiojIulWYt9GRoRXd", "hJCLiUEZxZ2UHJTVJJGTkNWdEllT2FFZTxEMTJVe", "QdkQGFGUDl3UhpXSBJiOikXZLlGchJye"];
+const app = initializeApp(JSON.parse(atob(_k.join("").split("").reverse().join(""))));
+const db = getDatabase(app);
+const auth = getAuth(app);
+const ROOT = "craftglitch";
+const A = ROOT + "/addons", R = ROOT + "/ratings", M = ROOT + "/media", ADMIN = ROOT + "/admin";
+const MAX_PHOTOS = 8;
+const EMOJIS = ["🧩","🛗","🐾","🤖","🌀","⛏️","📦","🗡️","🏠","🔥","💎","🐉","⚡","🧪","🗺️","🎯"];
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const isFree = a => a.free || !Number(a.price);
+const num = n => Number(n).toLocaleString("it-IT", {maximumFractionDigits: 2});
+const cube = '<svg class="cube"><use href="#cube"/></svg>';
+
+const DEFAULTS = [
+  {name:"Elevator", emoji:"🛗", color:"cyan", free:false, price:2.99, version:"1.0", mcVersion:"1.21+", size:"", tag:"",
+   tagline:"Move between floors in one jump.",
+   description:"Place an Elevator block on every floor of your base and travel between them instantly.\n\nJump to go up, sneak to go down. No ladders, no water columns.",
+   features:["Floors at any height","Works in multiplayer","Craftable in survival"],
+   howTo:["Craft the Elevator block","Place one on each floor, in the same column","Stand on it: jump to go up, sneak to go down"],
+   gallery:[], video:"", changelog:["1.0: First release"]},
+  {name:"PetChest", emoji:"🐾", color:"violet", free:true, price:0, version:"1.0", mcVersion:"1.21+", size:"", tag:"Free",
+   tagline:"Your pet carries your loot.",
+   description:"Give your tamed pet a chest. It follows you around and keeps your items safe.",
+   features:["Extra inventory that follows you","Works with wolves, cats and horses","Items stay saved"],
+   howTo:["Tame a pet","Use a chest on it","Interact with the pet to open its inventory"],
+   gallery:[], video:"", changelog:["1.0: First release"]},
+  {name:"Bot", emoji:"🤖", color:"magenta", free:false, price:4.99, version:"1.0", mcVersion:"1.21+", size:"", tag:"New",
+   tagline:"A helper that works for you.",
+   description:"Spawn a bot that follows you, protects you and helps around your world.",
+   features:["Simple commands","Follows and defends you","Customizable"],
+   howTo:["Craft the Bot spawn egg","Place it near you","Interact with it to give orders"],
+   gallery:[], video:"", changelog:["1.0: First release"]},
+  {name:"Teleport", emoji:"🌀", color:"violet", free:true, price:0, version:"1.0", mcVersion:"1.21+", size:"", tag:"",
+   tagline:"Jump between your bases instantly.",
+   description:"Create named teleport points and travel between your bases in a second.",
+   features:["Named teleport points","Instant travel","Particle effects"],
+   howTo:["Craft a Teleport pad","Place it and give it a name","Step on any pad and choose where to go"],
+   gallery:[], video:"", changelog:["1.0: First release"]},
+  {name:"AutoMiner", emoji:"⛏️", color:"cyan", free:false, price:3.99, version:"1.0", mcVersion:"1.21+", size:"", tag:"",
+   tagline:"A machine that mines for you.",
+   description:"Place the AutoMiner, give it fuel and let it dig. Every ore ends up in a chest.",
+   features:["Mines a full area automatically","Collects drops into a chest","Stops when the chest is full"],
+   howTo:["Craft the AutoMiner","Place it with a chest next to it","Add fuel and switch it on"],
+   gallery:[], video:"", changelog:["1.0: First release"]}
+];
+
+let addons = [], ratings = {}, unsubs = [];
+let adminUid, setupMode = false;
+
+/* =================== ACCESSO =================== */
+onValue(ref(db, ADMIN), snap => {
+  adminUid = snap.val(); setupMode = !adminUid;
+  $("lTitle").textContent = setupMode ? "Benvenuto!" : "Gestione addon";
+  $("lSub").textContent = setupMode
+    ? "Crea il tuo account: sarai l'unico che può gestire il sito."
+    : "Entra con la tua email e password.";
+  $("lPass2Wrap").hidden = !setupMode;
+  $("lPass").autocomplete = setupMode ? "new-password" : "current-password";
+  $("lBtn").textContent = setupMode ? "Crea il mio account" : "Entra";
+  $("lForgot").hidden = setupMode;
+  $("lBtn").disabled = false;
+  checkUser(auth.currentUser);
+}, () => { $("lSub").textContent = "Non riesco a leggere il database. Hai incollato le regole in Firebase?"; });
+
+const authMsg = c =>
+  c.includes("email-already-in-use") ? "Questa email ha già un account. Prova a entrare." :
+  c.includes("weak-password") ? "La password deve avere almeno 6 caratteri." :
+  c.includes("invalid-email") ? "Controlla l'email, sembra sbagliata." :
+  c.includes("operation-not-allowed") ? "In Firebase attiva Email/Password (Authentication → Sign-in method)." :
+  c.includes("too-many") ? "Troppi tentativi. Aspetta qualche minuto." :
+  c.includes("invalid") || c.includes("wrong") || c.includes("not-found") ? "Email o password sbagliate." :
+  "Qualcosa non ha funzionato (" + c + ").";
+
+$("loginForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const email = $("lEmail").value.trim(), pass = $("lPass").value;
+  $("lErr").textContent = "";
+  if (setupMode && pass !== $("lPass2").value){ $("lErr").textContent = "Le due password non sono uguali."; return; }
+  $("lBtn").disabled = true;
+  try {
+    if (setupMode){
+      const cred = await createUserWithEmailAndPassword(auth, email, pass);
+      try { await set(ref(db, ADMIN), cred.user.uid); } catch { await signOut(auth); throw {code: "claim"}; }
+      toast("Account creato!");
+    } else await signInWithEmailAndPassword(auth, email, pass);
+  } catch (err) {
+    $("lErr").textContent = err.code === "claim" ? "Account creato, ma il database lo ha rifiutato. Controlla le regole in Firebase." : authMsg(err.code || "");
+  } finally { $("lBtn").disabled = false; }
+});
+$("lForgot").addEventListener("click", async () => {
+  const email = $("lEmail").value.trim();
+  if (!email){ $("lErr").textContent = "Scrivi prima la tua email qui sopra."; $("lEmail").focus(); return; }
+  try { await sendPasswordResetEmail(auth, email); $("lErr").textContent = ""; toast("Ti ho mandato un'email per cambiare password"); }
+  catch (err) { $("lErr").textContent = authMsg(err.code || ""); }
+});
+$("logout").addEventListener("click", () => { if (dirty && !confirm("Hai modifiche non salvate. Uscire lo stesso?")) return; dirty = false; signOut(auth); });
+
+onAuthStateChanged(auth, checkUser);
+function checkUser(user){
+  if (adminUid === undefined) return;
+  const ok = !!user && !user.isAnonymous && user.uid === adminUid;
+  if (user && !user.isAnonymous && adminUid && !ok){ signOut(auth); $("lErr").textContent = "Questo account non è l'admin del sito."; return; }
+  $("login").hidden = ok; $("app").hidden = !ok;
+  $("login").style.display = ok ? "none" : "grid";
+  unsubs.forEach(u => u()); unsubs = [];
+  if (!ok) return;
+  showList();
+  unsubs.push(onValue(ref(db, A), snap => {
+    addons = Object.entries(snap.val() || {}).map(([id, a]) => ({id, ...a}))
+      .sort((a, b) => (a.order ?? 99) - (b.order ?? 99) || String(a.name).localeCompare(b.name));
+    renderList();
+  }, err => toast("Errore nel leggere gli addon", true)));
+  unsubs.push(onValue(ref(db, R), snap => { ratings = snap.val() || {}; renderList(); }));
+}
+
+/* =================== LISTA =================== */
+function rstats(id){ const r = Object.values(ratings[id] || {}).map(x => +x.s).filter(Boolean); return {n: r.length, avg: r.length ? r.reduce((a, b) => a + b, 0) / r.length : 0}; }
+const iconHTML = a => a.icon ? `<img src="${esc(a.icon)}" alt="">` : a.image ? `<img src="${esc(a.image)}" alt="">` : esc(a.emoji || "🧩");
+const colorVar = c => `var(--${c === "magenta" ? "mag" : c === "violet" ? "vio" : "cyan"})`;
+
+function renderList(){
+  const free = addons.filter(isFree).length;
+  $("summary").textContent = addons.length ? `${addons.length} addon · ${free} gratis · ${addons.length - free} a pagamento` : "";
+  if (!addons.length){
+    $("cards").innerHTML = `<div class="empty"><h2>Ancora nessun addon</h2><p>Puoi partire dai 5 addon già pronti (Elevator, PetChest, Bot, Teleport, AutoMiner) e poi modificarli.</p>
+      <div class="row"><button class="btn green big" id="seed">Usa i 5 addon pronti</button><button class="btn big" id="add2">+ Crea da zero</button></div></div>`;
+    $("seed").onclick = seed; $("add2").onclick = () => openEditor();
+    return;
+  }
+  $("cards").innerHTML = addons.map((a, i) => {
+    const r = rstats(a.id);
+    return `<div class="card ${a.visible === false ? "off" : ""}" style="--c:${colorVar(a.color)}">
+      <div class="slot">${iconHTML(a)}</div>
+      <div class="info"><h3>${esc(a.name)}</h3>
+        <div class="meta">${a.visible === false ? '<span class="tag off">Nascosto</span>' : ""}${a.tag ? `<span class="tag">${esc(a.tag)}</span>` : ""}
+          <span>❤ ${r.n ? `<b>${r.avg.toFixed(1)}</b> (${r.n} voti)` : "nessun voto"}</span>
+          <span>📷 ${a.photos || 0} foto</span></div></div>
+      <div class="price ${isFree(a) ? "free" : ""}">${isFree(a) ? "GRATIS" : cube + " " + num(a.price)}</div>
+      <div class="acts">
+        <button class="btn sm green" type="button" data-edit="${a.id}">Modifica</button>
+        <button class="iconbtn" type="button" data-move="-1" data-i="${i}" title="Sposta su" aria-label="Sposta su" ${i === 0 ? "disabled" : ""}>▲</button>
+        <button class="iconbtn" type="button" data-move="1" data-i="${i}" title="Sposta giù" aria-label="Sposta giù" ${i === addons.length - 1 ? "disabled" : ""}>▼</button>
+        <button class="iconbtn del" type="button" data-del="${a.id}" title="Elimina" aria-label="Elimina">🗑</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+$("cards").addEventListener("click", async e => {
+  const t = e.target.closest("button"); if (!t) return;
+  if (t.dataset.edit) openEditor(addons.find(a => a.id === t.dataset.edit));
+  if (t.dataset.del){
+    const a = addons.find(x => x.id === t.dataset.del);
+    if (!confirm(`Vuoi eliminare "${a.name}"?\nVerranno cancellati anche foto e voti.`)) return;
+    try { await update(ref(db), {[`${A}/${a.id}`]: null, [`${M}/${a.id}`]: null, [`${R}/${a.id}`]: null}); toast(`"${a.name}" eliminato`); }
+    catch (err) { toast(errMsg(err), true); }
+  }
+  if (t.dataset.move){
+    const i = +t.dataset.i, j = i + +t.dataset.move, arr = [...addons];
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+    const upd = {}; arr.forEach((a, k) => upd[`${a.id}/order`] = k);
+    try { await update(ref(db, A), upd); } catch (err) { toast(errMsg(err), true); }
+  }
+});
+$("addBtn").addEventListener("click", () => openEditor());
+
+async function seed(){
+  try {
+    const upd = {};
+    DEFAULTS.forEach((d, i) => { upd[push(ref(db, A)).key] = {...d, photos: 0, visible: true, order: i, updatedAt: Date.now()}; });
+    await update(ref(db, A), upd);
+    toast("Fatto! Ora modificali come vuoi");
+  } catch (err) { toast(errMsg(err), true); }
+}
+
+/* =================== EDITOR =================== */
+let ed = null, dirty = false;
+const lines = s => String(s || "").split("\n").map(x => x.trim()).filter(Boolean);
+const val = id => $(id).value.trim();
+
+function showList(){ $("listView").hidden = false; $("editView").hidden = true; $("saveBar").hidden = true; ed = null; dirty = false; scrollTo(0, 0); }
+function leaveEditor(){ if (dirty && !confirm("Hai modifiche non salvate. Vuoi uscire senza salvare?")) return; showList(); }
+$("backBtn").addEventListener("click", leaveEditor);
+$("cancelBtn").addEventListener("click", leaveEditor);
+addEventListener("beforeunload", e => { if (dirty){ e.preventDefault(); e.returnValue = ""; } });
+
+function openEditor(a){
+  ed = {id: a?.id || null, icon: a?.icon || "", emoji: a?.emoji || "🧩", free: a ? isFree(a) : true, color: a?.color || "cyan", photos: [], photosLoaded: !a || !a.photos, photosChanged: false};
+  $("eTitle").textContent = a ? `Modifica ${a.name}` : "Nuovo addon";
+  $("fName").value = a?.name || "";
+  $("fPrice").value = a && !isFree(a) ? String(a.price) : "";
+  $("fTagline").value = a?.tagline || "";
+  $("fDesc").value = a?.description || "";
+  $("fVideo").value = a?.video || "";
+  $("fFeat").value = (a?.features || []).join("\n");
+  $("fHow").value = (a?.howTo || []).join("\n");
+  $("fLog").value = (a?.changelog || []).join("\n");
+  $("fVer").value = a?.version || ""; $("fMc").value = a?.mcVersion || ""; $("fSize").value = a?.size || ""; $("fTag").value = a?.tag || "";
+  $("fVisible").checked = a ? a.visible !== false : true;
+  $("eErr").textContent = "";
+  document.querySelector("details.more").open = false;
+  renderIcon(); renderPrice(); renderColors(); renderPhotos();
+  $("listView").hidden = true; $("editView").hidden = false; $("saveBar").hidden = false;
+  scrollTo(0, 0); dirty = false;
+  if (a && a.photos){
+    get(ref(db, `${M}/${a.id}`)).then(s => {
+      if (!ed || ed.id !== a.id) return;
+      ed.photos = (s.val()?.gallery || []).filter(Boolean); ed.photosLoaded = true; renderPhotos();
+    }).catch(() => { ed.photosLoaded = true; renderPhotos(); toast("Non riesco a caricare le foto", true); });
+  }
+}
+$("editView").addEventListener("input", () => { dirty = true; });
+
+/* icona */
+function renderIcon(){
+  $("iconPrev").innerHTML = ed.icon ? `<img src="${ed.icon}" alt="">` : esc(ed.emoji);
+  $("iconDel").hidden = !ed.icon;
+  $("emojis").innerHTML = EMOJIS.map(e => `<button type="button" data-e="${e}" aria-pressed="${!ed.icon && ed.emoji === e}" aria-label="Emoji ${e}">${e}</button>`).join("");
+}
+$("emojis").addEventListener("click", e => { const b = e.target.closest("[data-e]"); if (!b) return; ed.emoji = b.dataset.e; ed.icon = ""; dirty = true; renderIcon(); });
+$("iconUp").addEventListener("click", () => $("iconFile").click());
+$("iconDel").addEventListener("click", () => { ed.icon = ""; dirty = true; renderIcon(); });
+$("iconFile").addEventListener("change", async e => {
+  const f = e.target.files[0]; e.target.value = "";
+  if (!f) return;
+  if (!okType(f)) return toast("Solo immagini PNG o JPG", true);
+  try { ed.icon = await toIcon(f); dirty = true; renderIcon(); toast("Icona caricata"); }
+  catch { toast("Non riesco a leggere questa immagine", true); }
+});
+
+/* prezzo */
+function renderPrice(){
+  $("cFree").setAttribute("aria-pressed", ed.free); $("cPaid").setAttribute("aria-pressed", !ed.free);
+  $("priceWrap").hidden = ed.free;
+}
+$("cFree").addEventListener("click", () => { ed.free = true; dirty = true; renderPrice(); });
+$("cPaid").addEventListener("click", () => { ed.free = false; dirty = true; renderPrice(); setTimeout(() => $("fPrice").focus(), 50); });
+
+/* colore */
+function renderColors(){ document.querySelectorAll("#colors button").forEach(b => b.setAttribute("aria-pressed", b.dataset.c === ed.color)); }
+$("colors").addEventListener("click", e => { const b = e.target.closest("[data-c]"); if (!b) return; ed.color = b.dataset.c; dirty = true; renderColors(); });
+
+/* foto */
+function renderPhotos(){
+  if (!ed.photosLoaded){ $("photos").innerHTML = `<div class="photo loading">Carico le foto…</div>`; return; }
+  $("photos").innerHTML = ed.photos.map((p, i) => `<div class="photo" style="background-image:url('${p}')">
+      ${i === 0 ? '<span class="first">Principale</span>' : ""}
+      <div class="pacts">
+        ${i > 0 ? `<button type="button" data-pm="${i}" title="Sposta prima" aria-label="Sposta prima">◀</button>` : ""}
+        <button type="button" class="del" data-pd="${i}" title="Togli foto" aria-label="Togli foto">✕</button>
+      </div></div>`).join("");
+  $("drop").hidden = ed.photos.length >= MAX_PHOTOS;
+}
+$("photos").addEventListener("click", e => {
+  const d = e.target.closest("[data-pd]"), m = e.target.closest("[data-pm]");
+  if (d){ ed.photos.splice(+d.dataset.pd, 1); }
+  else if (m){ const i = +m.dataset.pm; [ed.photos[i - 1], ed.photos[i]] = [ed.photos[i], ed.photos[i - 1]]; }
+  else return;
+  ed.photosChanged = true; dirty = true; renderPhotos();
+});
+const drop = $("drop");
+drop.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " "){ e.preventDefault(); $("photoFile").click(); } });
+$("photoFile").addEventListener("change", e => { addPhotos([...e.target.files]); e.target.value = ""; });
+["dragenter", "dragover"].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.add("over"); }));
+["dragleave", "drop"].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.remove("over"); }));
+drop.addEventListener("drop", e => addPhotos([...e.dataTransfer.files]));
+
+async function addPhotos(files){
+  if (!ed.photosLoaded) return toast("Aspetta che finiscano di caricare le foto", true);
+  const bad = files.filter(f => !okType(f));
+  files = files.filter(okType);
+  if (bad.length) toast("Ho saltato i file che non sono PNG o JPG", true);
+  const room = MAX_PHOTOS - ed.photos.length;
+  if (files.length > room){ toast(`Puoi aggiungere ancora ${room} foto`, true); files = files.slice(0, room); }
+  for (const f of files){
+    try { ed.photos.push(await toPhoto(f)); ed.photosChanged = true; dirty = true; renderPhotos(); }
+    catch { toast(`Non riesco a leggere ${f.name}`, true); }
+  }
+}
+
+/* elaborazione immagini: le rimpicciolisco per tenere il sito veloce */
+const okType = f => /^image\/(png|jpeg)$/.test(f.type) || /\.(png|jpe?g)$/i.test(f.name);
+function loadImg(file){
+  return new Promise((res, rej) => { const u = URL.createObjectURL(file), i = new Image();
+    i.onload = () => { URL.revokeObjectURL(u); res(i); }; i.onerror = () => { URL.revokeObjectURL(u); rej(); }; i.src = u; });
+}
+async function toIcon(file){
+  const i = await loadImg(file), S = 128, c = document.createElement("canvas"); c.width = c.height = S;
+  const x = c.getContext("2d"), k = Math.min(S / i.width, S / i.height), w = i.width * k, h = i.height * k;
+  x.imageSmoothingEnabled = !(i.width <= 64 && i.height <= 64);
+  x.drawImage(i, (S - w) / 2, (S - h) / 2, w, h);
+  return c.toDataURL("image/png");
+}
+async function toPhoto(file){
+  const i = await loadImg(file), MAX = 1280, k = Math.min(1, MAX / Math.max(i.width, i.height));
+  const c = document.createElement("canvas"); c.width = Math.round(i.width * k); c.height = Math.round(i.height * k);
+  const x = c.getContext("2d"); x.fillStyle = "#000"; x.fillRect(0, 0, c.width, c.height); x.drawImage(i, 0, 0, c.width, c.height);
+  let q = .82, d = c.toDataURL("image/jpeg", q);
+  while (d.length > 350000 && q > .4){ q -= .1; d = c.toDataURL("image/jpeg", q); }
+  return d;
+}
+
+/* salvataggio */
+$("saveBtn").addEventListener("click", async () => {
+  $("eErr").textContent = "";
+  const name = val("fName");
+  const price = Math.round(parseFloat(val("fPrice").replace(",", ".")) * 100) / 100;
+  if (!name){ $("eErr").textContent = "Scrivi il nome dell'addon (punto 1)."; $("fName").focus(); return; }
+  if (!ed.free && !(price > 0)){ $("eErr").textContent = "Scrivi quanti cubi costa (punto 2)."; $("fPrice").focus(); return; }
+  if (!ed.photosLoaded){ $("eErr").textContent = "Aspetta che le foto finiscano di caricare."; return; }
+  const data = {
+    name, emoji: ed.emoji, icon: ed.icon, image: null,
+    free: ed.free, price: ed.free ? 0 : price,
+    tagline: val("fTagline"), description: $("fDesc").value.trim(), video: val("fVideo"),
+    features: lines($("fFeat").value), howTo: lines($("fHow").value), changelog: lines($("fLog").value),
+    version: val("fVer"), mcVersion: val("fMc"), size: val("fSize"), tag: val("fTag"),
+    color: ed.color, visible: $("fVisible").checked, photos: ed.photos.length, gallery: null, updatedAt: Date.now()
+  };
+  const id = ed.id || push(ref(db, A)).key;
+  if (!ed.id) data.order = addons.length ? Math.max(...addons.map(a => a.order ?? 0)) + 1 : 0;
+  const upd = {};
+  Object.entries(data).forEach(([k, v]) => upd[`${A}/${id}/${k}`] = v);
+  if (ed.photosChanged || !ed.id) upd[`${M}/${id}`] = ed.photos.length ? {gallery: ed.photos} : null;
+  $("saveBtn").disabled = true; $("saveBtn").textContent = "Salvo…";
+  try { await update(ref(db), upd); dirty = false; toast(`"${name}" salvato!`); showList(); }
+  catch (err) { $("eErr").textContent = errMsg(err); }
+  finally { $("saveBtn").disabled = false; $("saveBtn").textContent = "Salva"; }
+});
+
+function errMsg(err){
+  const m = String(err?.message || err).toLowerCase();
+  return m.includes("permission") ? "Il database ha rifiutato: controlla di aver incollato le regole nuove in Firebase."
+    : m.includes("size") || m.includes("too large") ? "Le foto sono troppo pesanti, prova a toglierne qualcuna."
+    : "Non sono riuscito a salvare. Controlla la connessione e riprova.";
+}
+function toast(msg, bad){
+  const t = $("toast"); t.textContent = msg; t.classList.toggle("bad", !!bad); t.classList.add("show");
+  clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 2800);
+}
+</script>
+</body>
+</html>
