@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
-    <loc>https://agonylecter.github.io/GlitchCraft-./</loc>
+    <loc>https://glitchcraft-xi.vercel.app/</loc>
     <lastmod>2026-10-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
-    <image:image><image:loc>https://agonylecter.github.io/GlitchCraft-./logo.png</image:loc></image:image>
+    <image:image><image:loc>https://glitchcraft-xi.vercel.app/logo.png</image:loc></image:image>
   </url>
 </urlset>
