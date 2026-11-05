@@ -137,6 +137,12 @@ label.lbl{display:block;font-weight:700;margin-bottom:6px}
 .switch input:checked+.tr{background:var(--green)}
 .switch input:checked+.tr::after{left:29px}
 .switch input:focus-visible+.tr{outline:3px solid var(--yellow);outline-offset:2px}
+.sec.spook{background:linear-gradient(135deg,#1a0508,#0b0204);border-color:#000;box-shadow:inset 0 0 40px rgba(212,20,31,.25)}
+.sec.spook h2{color:#ffd9d9;text-shadow:0 0 12px rgba(212,20,31,.8)}
+.sec.spook .n{background:#d4141f;color:#fff}
+.sec.spook .switch input:checked+.tr{background:#d4141f;box-shadow:0 0 14px rgba(212,20,31,.7)}
+.tag.horror{background:#d4141f;color:#fff}
+.card.horror{border-left-color:#d4141f;background:linear-gradient(90deg,#1f070b,var(--panel) 40%)}
 details.more{background:var(--panel);border:3px solid #000;margin-bottom:16px}
 details.more summary{cursor:pointer;padding:18px 22px;font:700 20px var(--px);list-style:none;display:flex;justify-content:space-between}
 details.more summary::-webkit-details-marker{display:none}
@@ -253,6 +259,12 @@ details.more .in{padding:0 22px 22px}
       </label>
       <div class="photos" id="photos"></div>
       <div class="field" style="margin-top:18px"><label class="lbl" for="fVideo">Video YouTube <span class="help">Facoltativo. Incolla il link del video.</span></label><input id="fVideo" type="url" placeholder="https://youtu.be/…"></div>
+    </section>
+
+    <section class="sec spook">
+      <h2><span class="n">🎃</span>Sezione Horror</h2>
+      <p class="help">Accendi se è un addon horror: sul sito finisce nella sezione Horror (rossa, con nebbia e occhi) invece che nella lista normale.</p>
+      <label class="switch"><input type="checkbox" id="fHorror"><span class="tr"></span><span>Addon horror</span></label>
     </section>
 
     <details class="more">
@@ -421,7 +433,7 @@ const colorVar = c => `var(--${c === "magenta" ? "mag" : c === "violet" ? "vio" 
 
 function renderList(){
   const free = addons.filter(isFree).length;
-  $("summary").textContent = addons.length ? `${addons.length} addon · ${free} gratis · ${addons.length - free} a pagamento` : "";
+  $("summary").textContent = addons.length ? `${addons.length} addon · ${free} gratis · ${addons.length - free} a pagamento · ${addons.filter(a => a.horror).length} horror` : "";
   if (!addons.length){
     $("cards").innerHTML = `<div class="empty"><h2>Ancora nessun addon</h2><p>Puoi partire dai 5 addon già pronti (Elevator, PetChest, Bot, Teleport, AutoMiner) e poi modificarli.</p>
       <div class="row"><button class="btn green big" id="seed">Usa i 5 addon pronti</button><button class="btn big" id="add2">+ Crea da zero</button></div></div>`;
@@ -430,10 +442,10 @@ function renderList(){
   }
   $("cards").innerHTML = addons.map((a, i) => {
     const r = rstats(a.id);
-    return `<div class="card ${a.visible === false ? "off" : ""}" style="--c:${colorVar(a.color)}">
+    return `<div class="card ${a.visible === false ? "off" : ""} ${a.horror ? "horror" : ""}" style="--c:${colorVar(a.color)}">
       <div class="slot">${iconHTML(a)}</div>
       <div class="info"><h3>${esc(a.name)}</h3>
-        <div class="meta">${a.visible === false ? '<span class="tag off">Nascosto</span>' : ""}${a.tag ? `<span class="tag">${esc(a.tag)}</span>` : ""}
+        <div class="meta">${a.visible === false ? '<span class="tag off">Nascosto</span>' : ""}${a.horror ? '<span class="tag horror">🎃 Horror</span>' : ""}${a.tag ? `<span class="tag">${esc(a.tag)}</span>` : ""}
           <span>❤ ${r.n ? `<b>${r.avg.toFixed(1)}</b> (${r.n} voti)` : "nessun voto"}</span>
           <span>📷 ${a.photos || 0} foto</span></div></div>
       <div class="price ${isFree(a) ? "free" : ""}">${isFree(a) ? "GRATIS" : cube + " " + num(a.price)}</div>
@@ -497,6 +509,7 @@ function openEditor(a){
   $("fLog").value = (a?.changelog || []).join("\n");
   $("fVer").value = a?.version || ""; $("fMc").value = a?.mcVersion || ""; $("fSize").value = a?.size || ""; $("fTag").value = a?.tag || "";
   $("fVisible").checked = a ? a.visible !== false : true;
+  $("fHorror").checked = !!a?.horror;
   $("eErr").textContent = "";
   document.querySelector("details.more").open = false;
   renderIcon(); renderPrice(); renderColors(); renderPhotos();
@@ -614,7 +627,7 @@ $("saveBtn").addEventListener("click", async () => {
     tagline: val("fTagline"), description: $("fDesc").value.trim(), video: val("fVideo"),
     features: lines($("fFeat").value), howTo: lines($("fHow").value), changelog: lines($("fLog").value),
     version: val("fVer"), mcVersion: val("fMc"), size: val("fSize"), tag: val("fTag"),
-    color: ed.color, visible: $("fVisible").checked, photos: ed.photos.length, gallery: null, updatedAt: Date.now()
+    color: ed.color, visible: $("fVisible").checked, horror: $("fHorror").checked, photos: ed.photos.length, gallery: null, updatedAt: Date.now()
   };
   const id = ed.id || push(ref(db, A)).key;
   if (!ed.id) data.order = addons.length ? Math.max(...addons.map(a => a.order ?? 0)) + 1 : 0;

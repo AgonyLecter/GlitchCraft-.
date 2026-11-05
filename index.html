@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>MCPE Addons – Free &amp; Premium Minecraft PE / Bedrock Add-ons | CraftGlitch</title>
 <meta name="description" content="Download MCPE addons for Minecraft Bedrock &amp; Pocket Edition: Elevator, PetChest, Bot, Teleport, AutoMiner and more. Free and premium .mcaddon packs for mobile, Windows, Xbox and Realms.">
-<meta name="keywords" content="mcpe addons, mcpe addon, minecraft pe addons, minecraft bedrock addons, addon mcpe, addon minecraft pe, mcaddon, minecraft add-ons, bedrock add-ons, free mcpe addons, elevator addon, autominer addon, teleport addon">
+<meta name="keywords" content="mcpe addons, mcpe addon, minecraft pe addons, minecraft bedrock addons, addon mcpe, addon minecraft pe, mcaddon, minecraft add-ons, bedrock add-ons, free mcpe addons, elevator addon, autominer addon, teleport addon, horror addon mcpe, minecraft horror addons">
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
 <link rel="canonical" href="https://glitchcraft-xi.vercel.app/">
 <meta name="theme-color" content="#05030f">
@@ -209,6 +209,41 @@ h2{font:700 clamp(32px,4.4vw,48px)/1.05 var(--px);margin:0 0 10px;text-shadow:3p
 
 .skel{height:300px;background:linear-gradient(90deg,var(--panel) 0%,#2a2148 50%,var(--panel) 100%);background-size:200% 100%;animation:sh 1.3s linear infinite;border:3px solid #000}
 @keyframes sh{to{background-position:-200% 0}}
+/* ---------- horror section ---------- */
+.horror{--blood:#d4141f;position:relative;overflow:hidden;padding:84px 0 88px;
+  background:radial-gradient(120% 70% at 50% 0%,rgba(150,0,12,.38),transparent 60%),linear-gradient(#05030f,#0b0204 18%,#0b0204 82%,#05030f)}
+.horror::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse at center,transparent 45%,rgba(0,0,0,.85) 100%)}
+.horror .fog{position:absolute;left:-50%;right:-50%;bottom:-40px;height:260px;pointer-events:none;opacity:.55;
+  background:radial-gradient(40% 60% at 30% 70%,rgba(120,10,20,.45),transparent 70%),radial-gradient(35% 55% at 70% 80%,rgba(80,0,10,.5),transparent 70%);
+  animation:fog 16s ease-in-out infinite alternate}
+@keyframes fog{to{transform:translateX(18%)}}
+.horror .wrap{position:relative}
+.eyes{position:absolute;inset:0;pointer-events:none}
+.eyes i{position:absolute;display:flex;gap:10px;opacity:0;animation:stare 7s steps(1) infinite}
+.eyes i::before,.eyes i::after{content:"";width:10px;height:5px;background:var(--blood);box-shadow:0 0 10px 2px rgba(212,20,31,.8)}
+.eyes i:nth-child(1){left:6%;top:18%;animation-delay:.5s}
+.eyes i:nth-child(2){right:8%;top:30%;animation-delay:2.6s;transform:scale(.7)}
+.eyes i:nth-child(3){left:14%;bottom:16%;animation-delay:4.2s;transform:scale(.55)}
+.eyes i:nth-child(4){right:20%;bottom:10%;animation-delay:5.6s}
+@keyframes stare{0%{opacity:0}8%{opacity:1}10%{opacity:0}12%{opacity:1}34%{opacity:0}}
+.horror h2{font:700 clamp(38px,6vw,64px)/1 var(--px);margin:0 0 10px;color:#ffd9d9;letter-spacing:.02em;
+  text-shadow:0 0 18px rgba(212,20,31,.85),3px 3px 0 #3a0006;animation:flicker 5s infinite}
+@keyframes flicker{0%,19%,21%,62%,64%,100%{opacity:1}20%,63%{opacity:.35}}
+.horror h2 .drip{position:relative;display:inline-block}
+.horror h2 .drip::after{content:"";position:absolute;left:18%;top:88%;width:6px;height:0;background:var(--blood);
+  box-shadow:22px 0 0 var(--blood),58px 0 0 var(--blood);animation:drip 4s ease-in infinite}
+@keyframes drip{0%{height:0;opacity:1}70%{height:26px;opacity:1}100%{height:34px;opacity:0}}
+.horror .kick{display:inline-block;font:600 14px var(--body);letter-spacing:.2em;text-transform:uppercase;color:var(--blood);margin-bottom:10px}
+.horror .sub{color:#c9a7a7}
+.horror .addon{--accent:var(--blood);background:#170609;box-shadow:inset 3px 3px 0 #3d0d14,inset -3px -3px 0 #070102}
+.horror .addon:hover{animation:shake .3s}
+.horror .addon:hover .slot{box-shadow:inset 3px 3px 0 #000,inset -3px -3px 0 #3d0d14,0 0 0 3px var(--blood),0 0 22px rgba(212,20,31,.6)}
+.horror .addon .slot{background:#0a0203;box-shadow:inset 3px 3px 0 #000,inset -3px -3px 0 #3d0d14}
+.horror .addon .tagline{color:#e2c4c4}
+.horror .ribbon{background:var(--blood);color:#fff}
+@keyframes shake{25%{transform:translate(-2px,-4px) rotate(-.6deg)}50%{transform:translate(2px,-4px) rotate(.6deg)}75%{transform:translate(-1px,-4px)}}
+.mc-btn.blood{--b:#a3121c;--bd:#4a060b}
 .empty{grid-column:1/-1;padding:48px;text-align:center;color:var(--muted)}
 .empty strong{display:block;color:var(--ink);font:700 24px var(--px);margin-bottom:6px}
 
@@ -330,6 +365,7 @@ dialog::backdrop{background:rgba(0,0,0,.72);backdrop-filter:blur(4px)}
     <a class="brand" href="./"><img src="favicon.png" alt="CraftGlitch MCPE addons" width="32" height="32">CraftGlitch</a>
     <nav aria-label="Main">
       <a href="#addons">Add-ons</a>
+      <a href="#horror" id="navHorror" hidden>Horror</a>
       <a href="#how">How it works</a>
       <a href="#faq">FAQ</a>
     </nav>
@@ -375,6 +411,17 @@ dialog::backdrop{background:rgba(0,0,0,.72);backdrop-filter:blur(4px)}
         <div class="skel"></div><div class="skel"></div><div class="skel"></div>
       </div>
       <noscript><div class="empty mc-panel"><strong>Our MCPE addons</strong>Elevator, PetChest, Bot, Teleport, AutoMiner and more Minecraft Bedrock add-ons. Turn on JavaScript to see the full list, or email us at glitchcraft666yt@gmail.com.</div></noscript>
+    </div>
+  </section>
+
+  <section class="horror" id="horror" hidden>
+    <div class="fog" aria-hidden="true"></div>
+    <div class="eyes" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    <div class="wrap">
+      <span class="kick">Don't play alone</span>
+      <h2><span class="drip">Horror</span> Add-ons</h2>
+      <p class="sub">Scary MCPE add-ons for Minecraft Bedrock: monsters, jumpscares and nights you won't forget.</p>
+      <div class="grid" id="hgrid"></div>
     </div>
   </section>
 
@@ -486,7 +533,7 @@ import("https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js")
 const MAIL = ["glitchcraft666yt", "gmail.com"].join("@");
 const ROOT = "craftglitch";
 const $ = id => document.getElementById(id);
-const grid = $("grid");
+const grid = $("grid"), hgrid = $("hgrid");
 let addons = [], ratings = {}, filter = "all", current = null, tab = "overview", galIdx = 0, voting = false;
 
 /* ---------- helpers ---------- */
@@ -559,7 +606,7 @@ function seoData(){
   const base = location.origin + location.pathname;
   const items = addons.map((a, i) => {
     const {n, avg} = stats(a.id), img = safeUrl(a.icon || a.image);
-    const app = {"@type": "SoftwareApplication", name: a.name, applicationCategory: "GameApplication", applicationSubCategory: "Minecraft Bedrock Add-on",
+    const app = {"@type": "SoftwareApplication", name: a.name, applicationCategory: "GameApplication", applicationSubCategory: isHorror(a) ? "Minecraft Bedrock Horror Add-on" : "Minecraft Bedrock Add-on",
       operatingSystem: "Minecraft Bedrock Edition (Android, iOS, Windows, Xbox, PlayStation, Switch)",
       description: String(a.description || a.tagline || a.name + " add-on for MCPE / Minecraft Bedrock"), url: base + "#addons",
       offers: {"@type": "Offer", price: isFree(a) ? "0" : String(Number(a.price)), priceCurrency: "EUR", availability: "https://schema.org/InStock"}};
@@ -573,16 +620,10 @@ function seoData(){
 }
 
 /* ---------- grid ---------- */
-function render(){
-  if (addons.length) seoData();
-  const list = addons.filter(a => filter === "all" || (filter === "free" ? isFree(a) : !isFree(a)));
-  if (!list.length){
-    grid.innerHTML = `<div class="empty mc-panel"><strong>${addons.length ? "Nothing here." : "No add-ons yet."}</strong>${addons.length ? "Try another filter." : "New add-ons are on the way. Check back soon."}</div>`;
-    return;
-  }
-  grid.innerHTML = list.map(a => {
-    const free = isFree(a);
-    return `<article class="addon mc-panel" data-color="${esc(a.color || "cyan")}" data-open="${esc(a.id)}">
+const isHorror = a => !!a.horror;
+function cardHTML(a){
+  const free = isFree(a), h = isHorror(a);
+  return `<article class="addon mc-panel" data-color="${esc(a.color || "cyan")}" data-open="${esc(a.id)}">
       ${a.tag ? `<span class="ribbon">${esc(a.tag)}</span>` : ""}
       <div class="head"><div class="slot">${iconHTML(a)}</div>
         <div><h3>${esc(a.name)}</h3>${ratingLine(a.id)}</div></div>
@@ -593,30 +634,41 @@ function render(){
           <button class="mc-btn sm" type="button" data-open="${esc(a.id)}">Details</button>
           ${blockedUntil(a.id)
             ? `<button class="mc-btn sm done" type="button" data-req="${esc(a.id)}">Requested ✓</button>`
-            : `<button class="mc-btn sm ${free ? "green" : "amethyst"}" type="button" data-req="${esc(a.id)}">${free ? "Get it" : "Request"}</button>`}
+            : `<button class="mc-btn sm ${h ? "blood" : free ? "green" : "amethyst"}" type="button" data-req="${esc(a.id)}">${free ? "Get it" : "Request"}</button>`}
         </div>
       </div>
     </article>`;
-  }).join("");
+}
+function render(){
+  if (addons.length) seoData();
+  const scary = addons.filter(isHorror);
+  $("horror").hidden = $("navHorror").hidden = !scary.length;
+  hgrid.innerHTML = scary.map(cardHTML).join("");
+  const list = addons.filter(a => !isHorror(a) && (filter === "all" || (filter === "free" ? isFree(a) : !isFree(a))));
+  if (!list.length){
+    grid.innerHTML = `<div class="empty mc-panel"><strong>${addons.length ? "Nothing here." : "No add-ons yet."}</strong>${addons.length ? "Try another filter." : "New add-ons are on the way. Check back soon."}</div>`;
+    return;
+  }
+  grid.innerHTML = list.map(cardHTML).join("");
 }
 document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", () => {
   filter = b.dataset.f;
   document.querySelectorAll(".tabs button").forEach(x => x.setAttribute("aria-pressed", x === b));
   render();
 }));
-grid.addEventListener("click", e => {
+[grid, hgrid].forEach(g => g.addEventListener("click", e => {
   const r = e.target.closest("[data-req]");
   if (r) { e.stopPropagation(); return openRequest(addons.find(a => a.id === r.dataset.req)); }
   const o = e.target.closest("[data-open]");
   if (o) openDetail(addons.find(a => a.id === o.dataset.open));
-});
+}));
 
 /* ---------- details window ---------- */
 function openDetail(a){
   if (!a) return;
   current = a; tab = "overview"; galIdx = 0;
   const d = $("detail");
-  d.style.setProperty("--accent", a.color === "magenta" ? "var(--mag)" : a.color === "violet" ? "var(--vio)" : "var(--cyan)");
+  d.style.setProperty("--accent", isHorror(a) ? "#d4141f" : a.color === "magenta" ? "var(--mag)" : a.color === "violet" ? "var(--vio)" : "var(--cyan)");
   $("dIcon").innerHTML = iconHTML(a);
   $("dName").textContent = a.name;
   $("dTag").textContent = a.tagline || "";
