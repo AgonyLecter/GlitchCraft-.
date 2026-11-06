@@ -46,7 +46,7 @@ label.lbl{display:block;font-weight:700;margin-bottom:6px}
 .field:last-child{margin-bottom:0}
 .err{color:var(--red);font-size:15px;min-height:22px;margin:6px 0 10px}
 .slot{width:64px;height:64px;flex:none;display:grid;place-items:center;font-size:32px;background:var(--slot);box-shadow:inset 3px 3px 0 #000,inset -3px -3px 0 #3a2f60}
-.slot img{width:78%;height:78%;object-fit:contain;image-rendering:pixelated}
+.slot img{width:100%;height:100%;object-fit:cover}
 .cube{width:1em;height:1em;vertical-align:-.12em}
 
 /* login */
@@ -105,6 +105,7 @@ label.lbl{display:block;font-weight:700;margin-bottom:6px}
 .sec>p.help{margin:0 0 18px}
 .icon-pick{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
 .icon-pick .slot{width:96px;height:96px;font-size:48px}
+.icon-pick .slot:has(img){width:192px;height:108px}
 .icon-pick .opts{flex:1;min-width:220px}
 .emojis{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .emojis button{width:42px;height:42px;font-size:22px;background:var(--slot);border:2px solid #000;cursor:pointer}
@@ -216,12 +217,12 @@ details.more .in{padding:0 22px 22px}
 
     <section class="sec">
       <h2><span class="n">1</span>Nome e icona</h2>
-      <p class="help">L'icona è l'immagine quadrata che si vede nella card.</p>
+      <p class="help">L'immagine diventa la copertina grande della card sul sito. Usa un'immagine larga (16:9, es. 1280×720) e nitida.</p>
       <div class="field"><label class="lbl" for="fName">Nome dell'addon</label><input id="fName" maxlength="40" placeholder="Es. Elevator"></div>
       <div class="icon-pick">
         <div class="slot" id="iconPrev">🧩</div>
         <div class="opts">
-          <button class="btn sm" type="button" id="iconUp">📷 Carica icona (PNG o JPG)</button>
+          <button class="btn sm" type="button" id="iconUp">📷 Carica copertina (PNG o JPG)</button>
           <button class="btn sm red" type="button" id="iconDel" hidden>Togli immagine</button>
           <input type="file" id="iconFile" accept="image/png,image/jpeg" hidden>
           <span class="help" style="margin-top:8px">Oppure scegli un'emoji:</span>
@@ -316,7 +317,7 @@ const app = initializeApp(JSON.parse(atob(_k.join("").split("").reverse().join("
 const db = getDatabase(app);
 const auth = getAuth(app);
 const ROOT = "craftglitch";
-const A = ROOT + "/addons", R = ROOT + "/ratings", M = ROOT + "/media", ADMIN = ROOT + "/admin";
+const A = ROOT + "/addons", R = ROOT + "/ratings", M = ROOT + "/media", ADMIN = ROOT + "/admin", D = ROOT + "/downloads";
 const MAX_PHOTOS = 8;
 const EMOJIS = ["🧩","🛗","🐾","🤖","🌀","⛏️","📦","🗡️","🏠","🔥","💎","🐉","⚡","🧪","🗺️","🎯"];
 const $ = id => document.getElementById(id);
@@ -358,7 +359,7 @@ const DEFAULTS = [
    gallery:[], video:"", changelog:["1.0: First release"]}
 ];
 
-let addons = [], ratings = {}, unsubs = [];
+let addons = [], ratings = {}, downloads = {}, unsubs = [];
 let adminUid, setupMode = false;
 
 /* =================== ACCESSO =================== */
@@ -425,6 +426,7 @@ function checkUser(user){
     renderList();
   }, err => toast("Errore nel leggere gli addon", true)));
   unsubs.push(onValue(ref(db, R), snap => { ratings = snap.val() || {}; renderList(); }));
+  unsubs.push(onValue(ref(db, D), snap => { downloads = snap.val() || {}; renderList(); }, () => {}));
 }
 
 /* =================== LISTA =================== */
@@ -434,7 +436,7 @@ const colorVar = c => `var(--${c === "magenta" ? "mag" : c === "violet" ? "vio" 
 
 function renderList(){
   const free = addons.filter(isFree).length;
-  $("summary").textContent = addons.length ? `${addons.length} addon · ${free} gratis · ${addons.length - free} a pagamento · ${addons.filter(a => a.horror).length} horror` : "";
+  $("summary").textContent = addons.length ? `${addons.length} addon · ${free} gratis · ${addons.length - free} a pagamento · ${addons.filter(a => a.horror).length} horror · ⬇ ${addons.reduce((n, a) => n + (+downloads[a.id] || 0), 0)} download` : "";
   if (!addons.length){
     $("cards").innerHTML = `<div class="empty"><h2>Ancora nessun addon</h2><p>Puoi partire dai 5 addon già pronti (Elevator, PetChest, Bot, Teleport, AutoMiner) e poi modificarli.</p>
       <div class="row"><button class="btn green big" id="seed">Usa i 5 addon pronti</button><button class="btn big" id="add2">+ Crea da zero</button></div></div>`;
@@ -448,7 +450,7 @@ function renderList(){
       <div class="info"><h3>${esc(a.name)}</h3>
         <div class="meta">${a.visible === false ? '<span class="tag off">Nascosto</span>' : ""}${a.horror ? '<span class="tag horror">🎃 Horror</span>' : ""}${a.tag ? `<span class="tag">${esc(a.tag)}</span>` : ""}
           <span>❤ ${r.n ? `<b>${r.avg.toFixed(1)}</b> (${r.n} voti)` : "nessun voto"}</span>
-          <span>📷 ${a.photos || 0} foto</span>${isFree(a) && a.download ? "<span>⬇ download diretto</span>" : ""}</div></div>
+          <span>📷 ${a.photos || 0} foto</span>${isFree(a) && a.download ? `<span>⬇ <b>${+downloads[a.id] || 0}</b> download</span>` : ""}</div></div>
       <div class="price ${isFree(a) ? "free" : ""}">${isFree(a) ? "GRATIS" : cube + " " + num(a.price)}</div>
       <div class="acts">
         <button class="btn sm green" type="button" data-edit="${a.id}">Modifica</button>
@@ -601,11 +603,15 @@ function loadImg(file){
     i.onload = () => { URL.revokeObjectURL(u); res(i); }; i.onerror = () => { URL.revokeObjectURL(u); rej(); }; i.src = u; });
 }
 async function toIcon(file){
-  const i = await loadImg(file), S = 128, c = document.createElement("canvas"); c.width = c.height = S;
-  const x = c.getContext("2d"), k = Math.min(S / i.width, S / i.height), w = i.width * k, h = i.height * k;
+  // copertina: tiene le proporzioni, larga al massimo 960px, JPEG leggero
+  const i = await loadImg(file), k = Math.min(1, 960 / i.width), c = document.createElement("canvas");
+  c.width = Math.round(i.width * k); c.height = Math.round(i.height * k);
+  const x = c.getContext("2d"); x.fillStyle = "#000"; x.fillRect(0, 0, c.width, c.height);
   x.imageSmoothingEnabled = !(i.width <= 64 && i.height <= 64);
-  x.drawImage(i, (S - w) / 2, (S - h) / 2, w, h);
-  return c.toDataURL("image/png");
+  x.drawImage(i, 0, 0, c.width, c.height);
+  let q = .85, d = c.toDataURL("image/jpeg", q);
+  while (d.length > 250000 && q > .4){ q -= .1; d = c.toDataURL("image/jpeg", q); }
+  return d;
 }
 async function toPhoto(file){
   const i = await loadImg(file), MAX = 1280, k = Math.min(1, MAX / Math.max(i.width, i.height));
