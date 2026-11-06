@@ -78,7 +78,8 @@ main,header,footer{position:relative;z-index:1}
 .mc-panel{background:var(--panel);border:3px solid #000;box-shadow:inset 3px 3px 0 var(--panel-hi),inset -3px -3px 0 var(--panel-lo)}
 .slot{width:64px;height:64px;flex:none;display:grid;place-items:center;font-size:32px;background:var(--slot);
   box-shadow:inset 3px 3px 0 #000,inset -3px -3px 0 #3a2f60}
-.slot img{width:70%;height:70%;object-fit:contain;image-rendering:pixelated}
+.slot img{width:100%;height:100%;object-fit:cover}
+[hidden]{display:none!important}
 .mc-btn{--b:#4a4466;--bd:#25203d;display:inline-flex;align-items:center;justify-content:center;gap:10px;
   font:600 18px/1 var(--px);color:#fff;white-space:nowrap;text-shadow:2px 2px 0 rgba(0,0,0,.45);text-decoration:none;cursor:pointer;
   background:var(--b);border:2px solid #000;padding:12px 20px 16px;
@@ -187,6 +188,13 @@ h2{font:700 clamp(32px,4.4vw,48px)/1.05 var(--px);margin:0 0 10px;text-shadow:3p
 .addon::before{content:"";position:absolute;left:3px;right:3px;top:3px;height:5px;background:var(--accent)}
 .addon .head{display:flex;gap:16px;align-items:center;margin:6px 0 14px}
 .addon .slot{width:76px;height:76px;font-size:38px}
+.addon::before{z-index:1}
+.ribbon{z-index:2}
+.cover{position:relative;aspect-ratio:16/9;overflow:hidden;background:#000;border:3px solid #000}
+.cover img{width:100%;height:100%;object-fit:cover;transition:transform .3s}
+.addon .cover{margin:-14px -19px 16px;border-width:0 0 3px}
+.addon:hover .cover img{transform:scale(1.05)}
+.d-cover{margin-bottom:18px}
 .addon h3{margin:0 0 2px;font:700 26px/1.05 var(--px)}
 .addon .tagline{margin:0 0 16px;color:#d4cdf0}
 .ribbon{position:absolute;top:14px;right:14px;font:700 13px var(--px);padding:4px 8px;background:var(--splash);color:#2b2b00;border:2px solid #000}
@@ -271,6 +279,7 @@ dialog::backdrop{background:rgba(0,0,0,.72);backdrop-filter:blur(4px)}
 .win-foot{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 22px;border-top:3px solid #000;background:#150f29;flex-wrap:wrap}
 
 .d-head{display:flex;gap:18px;align-items:center;margin-bottom:18px}
+.d-head.wide{display:block}
 .d-head .slot{width:96px;height:96px;font-size:50px}
 .d-head h3{margin:0;font:700 34px/1 var(--px)}
 .d-head p{margin:6px 0 8px;color:#d4cdf0}
@@ -464,7 +473,8 @@ dialog::backdrop{background:rgba(0,0,0,.72);backdrop-filter:blur(4px)}
 <dialog id="detail" aria-labelledby="dName">
   <div class="win-bar"><span>Add-on details</span><button class="x-btn" type="button" data-close aria-label="Close">✕</button></div>
   <div class="win-body">
-    <div class="d-head">
+    <div class="cover d-cover" id="dCover" hidden></div>
+    <div class="d-head" id="dHead">
       <div class="slot" id="dIcon"></div>
       <div><h3 id="dName"></h3><p id="dTag"></p><div id="dStars"></div></div>
     </div>
@@ -506,7 +516,7 @@ dialog::backdrop{background:rgba(0,0,0,.72);backdrop-filter:blur(4px)}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, onValue, get, set, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { getDatabase, ref, onValue, get, set, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const _k = ["==QfiI1UChlS2skRzYULHJiOiQWS05WZtVmc1NXY", "l1mIsISM3cDM2Y2Y0IDOhRTZwkDOyU2MxEGM6IWZ", "3pDN4gjN0IjN5ITM0oTMiojIklEcwFmIsICN4gjN", "0IjN5ITM0IiOiQWSyVGZuV2Un5WanF2czVWbiwiI", "t92YuQ3bwNHcwFmLzQTZkVWL09mYvJnblVmcnJiO", "iQXZrNWdCV2ZhJ3b0NnIsIyM0UGZl1CdvJ2by5WZ", "lJ3ZiojIklEdjVmavJHciwiIwBXYuU2chJWY0FGZ", "lNXYiVmcpZmLxQ3cldXLlB3byVXZuIGZ0JXL0xWd", "hZWZk1yM0UGZl1CdvJ2by5WZlJ3Zv8iOzBHd0hmI", "6ICTSVVZzFmYhRXYkJCLi02bj5CcwFWZzFmYlJXa", "m5yM0UGZl1CdvJ2by5WZlJ3ZiojIulWYt9GRoRXd", "hJCLiUEZxZ2UHJTVJJGTkNWdEllT2FFZTxEMTJVe", "QdkQGFGUDl3UhpXSBJiOikXZLlGchJye"];
@@ -531,7 +541,7 @@ const dlLink = a => isFree(a) && /^https:\/\/\S+$/i.test(String(a.download || ""
 const num = n => Number(n).toLocaleString("en-US", {minimumFractionDigits: Number(n) % 1 ? 2 : 0, maximumFractionDigits: 2});
 const cube = '<svg class="cube" aria-hidden="true"><use href="#cube"/></svg>';
 const priceHTML = (a, note = true) => isFree(a)
-  ? `<div><div class="price free">Free</div>${note ? "<small style='display:block;font-size:12px;color:var(--muted);margin-top:4px'>Link by email</small>" : ""}</div>`
+  ? `<div><div class="price free">Free</div>${note ? `<small style='display:block;font-size:12px;color:var(--muted);margin-top:4px'>${dlLink(a) ? "Direct download" : "Link by email"}</small>` : ""}</div>`
   : `<div><div class="price" aria-label="${num(a.price)} cubes">${cube}${num(a.price)}</div>${note ? "<small style='display:block;font-size:12px;color:var(--muted);margin-top:4px'>Bank transfer</small>" : ""}</div>`;
 const dataImg = u => /^data:image\/(png|jpe?g|webp);base64,[A-Za-z0-9+/=]+$/.test(String(u || "")) ? u : "";
 const imgSrc = u => dataImg(u) || safeUrl(u);
@@ -610,9 +620,11 @@ function seoData(){
 const isHorror = a => !!a.horror;
 function cardHTML(a){
   const free = isFree(a), h = isHorror(a);
+  const cov = imgSrc(a.icon || a.image);
   return `<article class="addon mc-panel" data-color="${esc(a.color || "cyan")}" data-open="${esc(a.id)}">
       ${a.tag ? `<span class="ribbon">${esc(a.tag)}</span>` : ""}
-      <div class="head"><div class="slot">${iconHTML(a)}</div>
+      ${cov ? `<div class="cover"><img src="${esc(cov)}" alt="${esc(a.name)} MCPE add-on" loading="lazy"></div>` : ""}
+      <div class="head">${cov ? "" : `<div class="slot">${iconHTML(a)}</div>`}
         <div><h3>${esc(a.name)}</h3>${ratingLine(a.id)}</div></div>
       <p class="tagline">${esc(a.tagline || a.description || "")}</p>
       <div class="foot">
@@ -660,6 +672,9 @@ function openDetail(a){
   current = a; tab = "overview"; galIdx = 0;
   const d = $("detail");
   d.style.setProperty("--accent", isHorror(a) ? "#d4141f" : a.color === "magenta" ? "var(--mag)" : a.color === "violet" ? "var(--vio)" : "var(--cyan)");
+  const cov = imgSrc(a.icon || a.image);
+  $("dCover").hidden = !cov; $("dIcon").hidden = !!cov; $("dHead").classList.toggle("wide", !!cov);
+  $("dCover").innerHTML = cov ? `<img src="${esc(cov)}" alt="${esc(a.name)} MCPE add-on">` : "";
   $("dIcon").innerHTML = iconHTML(a);
   $("dName").textContent = a.name;
   $("dTag").textContent = a.tagline || "";
@@ -837,6 +852,8 @@ function markSent(id){
 }
 function markDl(id){
   const first = !requested(id);
+  /* contatore: una persona (browser) conta una volta sola per addon */
+  if (!store.get("cg_dl_" + id)){ store.set("cg_dl_" + id, "1"); set(ref(db, `${ROOT}/downloads/${id}`), increment(1)).catch(() => {}); }
   store.set("cg_req_" + id, String(Date.now()));
   if (current && current.id === id) renderRate();
   toast(first ? "Download started! Rating unlocked for this add-on." : "Download started!");
