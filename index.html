@@ -31,7 +31,7 @@
   {"@type":"FAQPage","mainEntity":[
     {"@type":"Question","name":"How fast do you reply?","acceptedAnswer":{"@type":"Answer","text":"Usually within 24 hours. Check your spam folder if you don't see our reply."}},
     {"@type":"Question","name":"How do I pay for a premium add-on?","acceptedAnswer":{"@type":"Answer","text":"By bank transfer. After your email we send you our IBAN; as soon as the payment arrives you get the download link."}},
-    {"@type":"Question","name":"Are free add-ons really free?","acceptedAnswer":{"@type":"Answer","text":"Yes. Send the email and you get the link, nothing to pay."}},
+    {"@type":"Question","name":"Are free add-ons really free?","acceptedAnswer":{"@type":"Answer","text":"Yes, nothing to pay. Many free add-ons have a Download button that gets you the file straight away; for the others, send the email and you get the link."}},
     {"@type":"Question","name":"Do these addons work on Minecraft PE (MCPE)?","acceptedAnswer":{"@type":"Answer","text":"Yes. All CraftGlitch add-ons are made for Minecraft Bedrock Edition, which includes Minecraft PE on Android and iOS, Windows, Xbox, PlayStation, Switch and Realms."}},
     {"@type":"Question","name":"How do I install an MCPE addon?","acceptedAnswer":{"@type":"Answer","text":"Open the .mcaddon or .mcpack file: Minecraft imports it automatically. Then edit your world, enable the behavior and resource packs and turn on any experimental toggles the add-on needs."}}
   ]}
@@ -40,19 +40,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Pixelify+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script>
-/* ---- page guard: blocks right-click, view-source and devtools shortcuts ---- */
-(function(){
-  var stop=function(e){e.preventDefault();e.stopPropagation();return false;};
-  document.addEventListener("contextmenu",stop,true);
-  document.addEventListener("dragstart",function(e){if(e.target&&e.target.tagName==="IMG")stop(e);},true);
-  document.addEventListener("keydown",function(e){
-    var k=(e.key||"").toLowerCase(),c=e.ctrlKey||e.metaKey;
-    if(k==="f12"||(c&&(k==="u"||k==="s"||k==="p"))||(c&&e.shiftKey&&(k==="i"||k==="j"||k==="c"||k==="k"))||(e.metaKey&&e.altKey&&(k==="i"||k==="j"||k==="c"||k==="u")))stop(e);
-  },true);
-  try{console.log("%cHold up!","color:#e43bff;font:700 32px sans-serif");console.log("%cThis console is for developers. Pasting code here can get your stuff stolen.","font:16px sans-serif");}catch(_){}
-})();
-</script>
 <style>
 :root{
   --sky:#05030f;
@@ -78,9 +65,8 @@
 }
 *,*::before,*::after{box-sizing:inherit}
 html{scroll-behavior:smooth;scroll-padding-top:calc(84px + env(safe-area-inset-top,0px))}
-body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;overflow-x:hidden;
-  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
-img{max-width:100%;display:block;-webkit-user-drag:none}
+body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;overflow-x:hidden}
+img{max-width:100%;display:block}
 a{color:inherit}
 :focus-visible{outline:3px solid var(--splash);outline-offset:3px}
 .wrap{width:min(1180px,100% - 40px);margin-inline:auto}
@@ -294,7 +280,7 @@ dialog::backdrop{background:rgba(0,0,0,.72);backdrop-filter:blur(4px)}
 .d-tabs{display:flex;flex-wrap:wrap;position:relative;z-index:1}
 .d-tabs button{font:600 16px var(--px);color:var(--muted);background:var(--slot);border:3px solid #000;border-bottom:0;padding:9px 14px;margin-right:-3px;cursor:pointer}
 .d-tabs button[aria-selected="true"]{background:#130d26;color:var(--ink);padding-bottom:12px;margin-bottom:-3px;box-shadow:inset 0 3px 0 var(--accent,var(--cyan))}
-.d-pane{background:#130d26;border:3px solid #000;padding:20px;min-height:170px;-webkit-user-select:text;user-select:text}
+.d-pane{background:#130d26;border:3px solid #000;padding:20px;min-height:170px}
 .d-pane p{margin:0 0 12px;color:#ddd6f6}
 .d-pane p:last-child{margin-bottom:0}
 .feat{list-style:none;margin:0;padding:0;display:grid;gap:10px}
@@ -432,7 +418,7 @@ dialog::backdrop{background:rgba(0,0,0,.72);backdrop-filter:blur(4px)}
       <ol class="steps">
         <li class="mc-panel"><b>1</b><h3>Pick an add-on</h3><p>Open it, read what it does, then press Request.</p></li>
         <li class="mc-panel"><b>2</b><h3>Send the email</h3><p>A ready-made email opens. Add your gamertag and send it.</p></li>
-        <li class="mc-panel"><b>3</b><h3>Get your link</h3><p>Free add-ons: you get the download link. Premium: you get our IBAN first, then the link once the transfer arrives.</p></li>
+        <li class="mc-panel"><b>3</b><h3>Get your link</h3><p>Free add-ons with a Download button skip this: you get the file right away. Other free add-ons: you get the download link. Premium: you get our IBAN first, then the link once the transfer arrives.</p></li>
       </ol>
       <div class="note mc-panel"><svg class="cube"><use href="#cube"/></svg><span>Prices are in cubes. One cube equals €1, paid by bank transfer.</span></div>
     </div>
@@ -445,7 +431,7 @@ dialog::backdrop{background:rgba(0,0,0,.72);backdrop-filter:blur(4px)}
       <div class="faq">
         <details class="mc-panel"><summary>How fast do you reply?</summary><p>Usually within 24 hours. Check your spam folder if you don't see our reply.</p></details>
         <details class="mc-panel"><summary>How do I pay for a premium add-on?</summary><p>By bank transfer. After your email we send you our IBAN; as soon as the payment arrives you get the download link.</p></details>
-        <details class="mc-panel"><summary>Are free add-ons really free?</summary><p>Yes. Send the email and you get the link, nothing to pay.</p></details>
+        <details class="mc-panel"><summary>Are free add-ons really free?</summary><p>Yes, nothing to pay. Many free add-ons have a Download button that gets you the file straight away; for the others, send the email and you get the link.</p></details>
         <details class="mc-panel"><summary>How do I rate an add-on?</summary><p>Request it first. Then open the add-on again and tap the hearts. Each player can rate each add-on once.</p></details>
         <details class="mc-panel"><summary>Do these addons work on Minecraft PE (MCPE)?</summary><p>Yes. All CraftGlitch add-ons are made for Minecraft Bedrock Edition, which includes Minecraft PE on Android and iOS, Windows, Xbox, PlayStation, Switch and Realms.</p></details>
         <details class="mc-panel"><summary>How do I install an MCPE addon?</summary><p>Open the .mcaddon or .mcpack file: Minecraft imports it automatically. Then edit your world, enable the behavior and resource packs and turn on any experimental toggles the add-on needs.</p></details>
@@ -541,6 +527,7 @@ const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt
 const safeUrl = u => { u = String(u || "").trim(); return /^(https?:\/\/|\.?\/?[\w-]+\/)/i.test(u) || /^[\w-]+\.(png|jpe?g|gif|webp)$/i.test(u) ? u : ""; };
 const lines = v => Array.isArray(v) ? v.filter(Boolean) : String(v || "").split("\n").map(s => s.trim()).filter(Boolean);
 const isFree = a => a.free || !Number(a.price);
+const dlLink = a => isFree(a) && /^https:\/\/\S+$/i.test(String(a.download || "").trim()) ? String(a.download).trim() : "";
 const num = n => Number(n).toLocaleString("en-US", {minimumFractionDigits: Number(n) % 1 ? 2 : 0, maximumFractionDigits: 2});
 const cube = '<svg class="cube" aria-hidden="true"><use href="#cube"/></svg>';
 const priceHTML = (a, note = true) => isFree(a)
@@ -632,7 +619,9 @@ function cardHTML(a){
         ${priceHTML(a)}
         <div class="acts">
           <button class="mc-btn sm" type="button" data-open="${esc(a.id)}">Details</button>
-          ${blockedUntil(a.id)
+          ${dlLink(a)
+            ? `<a class="mc-btn sm ${h ? "blood" : "green"}" href="${esc(dlLink(a))}" target="_blank" rel="noopener" data-dl="${esc(a.id)}">⬇ Download</a>`
+            : blockedUntil(a.id)
             ? `<button class="mc-btn sm done" type="button" data-req="${esc(a.id)}">Requested ✓</button>`
             : `<button class="mc-btn sm ${h ? "blood" : free ? "green" : "amethyst"}" type="button" data-req="${esc(a.id)}">${free ? "Get it" : "Request"}</button>`}
         </div>
@@ -657,6 +646,8 @@ document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click
   render();
 }));
 [grid, hgrid].forEach(g => g.addEventListener("click", e => {
+  const d = e.target.closest("[data-dl]");
+  if (d) { e.stopPropagation(); return markDl(d.dataset.dl); }
   const r = e.target.closest("[data-req]");
   if (r) { e.stopPropagation(); return openRequest(addons.find(a => a.id === r.dataset.req)); }
   const o = e.target.closest("[data-open]");
@@ -729,8 +720,14 @@ function renderTabs(){
 }
 $("dTabs").addEventListener("click", e => { const b = e.target.closest("[data-tab]"); if (b){ tab = b.dataset.tab; galIdx = 0; renderTabs(); } });
 $("dPane").addEventListener("click", e => { const b = e.target.closest("[data-g]"); if (b){ galIdx = +b.dataset.g; renderTabs(); } });
-$("dReq").addEventListener("click", () => openRequest(current));
+$("dReq").addEventListener("click", () => {
+  const link = current && dlLink(current);
+  if (!link) return openRequest(current);
+  window.open(link, "_blank", "noopener");
+  markDl(current.id);
+});
 function setReqBtn(a){
+  if (dlLink(a)){ $("dReq").textContent = "⬇ Download"; $("dReq").className = "mc-btn " + (isHorror(a) ? "blood" : "green"); return; }
   const free = isFree(a), done = blockedUntil(a.id);
   $("dReq").textContent = done ? "Requested ✓" : free ? "Get it free" : "Request";
   $("dReq").className = "mc-btn " + (done ? "done" : free ? "green" : "amethyst");
@@ -837,6 +834,12 @@ function markSent(id){
     render(); if (current && current.id === id){ setReqBtn(current); renderRate(); }
     if (first) toast("Rating unlocked for this add-on.");
   }, 300);
+}
+function markDl(id){
+  const first = !requested(id);
+  store.set("cg_req_" + id, String(Date.now()));
+  if (current && current.id === id) renderRate();
+  toast(first ? "Download started! Rating unlocked for this add-on." : "Download started!");
 }
 $("rSend").addEventListener("click", e => {
   const id = e.currentTarget.dataset.id;
