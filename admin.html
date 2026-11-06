@@ -241,6 +241,7 @@ details.more .in{padding:0 22px 22px}
         <label class="lbl" for="fPrice">Quanti cubi costa? <span class="help">1 cubo = 1 €</span></label>
         <div class="price-in"><svg class="cube"><use href="#cube"/></svg><input id="fPrice" type="text" inputmode="decimal" placeholder="2.99"></div>
       </div>
+      <div class="field" id="dlWrap"><label class="lbl" for="fDl">Link download diretto <span class="help">Facoltativo. Incolla il link MediaFire (o altro, deve iniziare con https://): sul sito compare il pulsante "Download" e il cliente scarica subito, senza email. Lascia vuoto per usare l'email.</span></label><input id="fDl" type="url" placeholder="https://www.mediafire.com/file/…"></div>
     </section>
 
     <section class="sec">
@@ -447,7 +448,7 @@ function renderList(){
       <div class="info"><h3>${esc(a.name)}</h3>
         <div class="meta">${a.visible === false ? '<span class="tag off">Nascosto</span>' : ""}${a.horror ? '<span class="tag horror">🎃 Horror</span>' : ""}${a.tag ? `<span class="tag">${esc(a.tag)}</span>` : ""}
           <span>❤ ${r.n ? `<b>${r.avg.toFixed(1)}</b> (${r.n} voti)` : "nessun voto"}</span>
-          <span>📷 ${a.photos || 0} foto</span></div></div>
+          <span>📷 ${a.photos || 0} foto</span>${isFree(a) && a.download ? "<span>⬇ download diretto</span>" : ""}</div></div>
       <div class="price ${isFree(a) ? "free" : ""}">${isFree(a) ? "GRATIS" : cube + " " + num(a.price)}</div>
       <div class="acts">
         <button class="btn sm green" type="button" data-edit="${a.id}">Modifica</button>
@@ -504,6 +505,7 @@ function openEditor(a){
   $("fTagline").value = a?.tagline || "";
   $("fDesc").value = a?.description || "";
   $("fVideo").value = a?.video || "";
+  $("fDl").value = a?.download || "";
   $("fFeat").value = (a?.features || []).join("\n");
   $("fHow").value = (a?.howTo || []).join("\n");
   $("fLog").value = (a?.changelog || []).join("\n");
@@ -545,6 +547,7 @@ $("iconFile").addEventListener("change", async e => {
 function renderPrice(){
   $("cFree").setAttribute("aria-pressed", ed.free); $("cPaid").setAttribute("aria-pressed", !ed.free);
   $("priceWrap").hidden = ed.free;
+  $("dlWrap").hidden = !ed.free;
 }
 $("cFree").addEventListener("click", () => { ed.free = true; dirty = true; renderPrice(); });
 $("cPaid").addEventListener("click", () => { ed.free = false; dirty = true; renderPrice(); setTimeout(() => $("fPrice").focus(), 50); });
@@ -620,6 +623,8 @@ $("saveBtn").addEventListener("click", async () => {
   const price = Math.round(parseFloat(val("fPrice").replace(",", ".")) * 100) / 100;
   if (!name){ $("eErr").textContent = "Scrivi il nome dell'addon (punto 1)."; $("fName").focus(); return; }
   if (!ed.free && !(price > 0)){ $("eErr").textContent = "Scrivi quanti cubi costa (punto 2)."; $("fPrice").focus(); return; }
+  const dl = val("fDl");
+  if (ed.free && dl && !/^https:\/\/\S+$/i.test(dl)){ $("eErr").textContent = "Il link download deve iniziare con https:// (punto 2)."; $("fDl").focus(); return; }
   if (!ed.photosLoaded){ $("eErr").textContent = "Aspetta che le foto finiscano di caricare."; return; }
   const data = {
     name, emoji: ed.emoji, icon: ed.icon, image: null,
@@ -627,7 +632,7 @@ $("saveBtn").addEventListener("click", async () => {
     tagline: val("fTagline"), description: $("fDesc").value.trim(), video: val("fVideo"),
     features: lines($("fFeat").value), howTo: lines($("fHow").value), changelog: lines($("fLog").value),
     version: val("fVer"), mcVersion: val("fMc"), size: val("fSize"), tag: val("fTag"),
-    color: ed.color, visible: $("fVisible").checked, horror: $("fHorror").checked, photos: ed.photos.length, gallery: null, updatedAt: Date.now()
+    color: ed.color, visible: $("fVisible").checked, horror: $("fHorror").checked, download: ed.free && dl ? dl : null, photos: ed.photos.length, gallery: null, updatedAt: Date.now()
   };
   const id = ed.id || push(ref(db, A)).key;
   if (!ed.id) data.order = addons.length ? Math.max(...addons.map(a => a.order ?? 0)) + 1 : 0;
