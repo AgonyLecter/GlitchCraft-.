@@ -345,7 +345,20 @@ h2{font:700 clamp(32px,4.4vw,48px)/1.05 var(--px);margin:0 0 10px;text-shadow:3p
 .iban-row code{font:700 clamp(18px,3.6vw,26px) var(--px);color:#ffc83d;letter-spacing:.04em;user-select:all;-webkit-user-select:all}
 .sup-copy .sup-help{font-size:15px;margin-bottom:12px}
 .cup-s{font-size:26px;flex:none}
-@media(max-width:700px){.sup-card{grid-template-columns:1fr;text-align:center;justify-items:center;padding:28px 20px}.iban-row{justify-content:center}}
+.amt-box{background:#0f0a1f;border:3px solid #000;box-shadow:inset 3px 3px 0 #000,inset -3px -3px 0 #3a2f60;padding:16px;margin-bottom:14px;max-width:520px}
+.amts{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.amts button{font:700 20px var(--px);color:var(--ink);background:var(--panel);border:3px solid #000;padding:8px 14px;min-width:64px;cursor:pointer;box-shadow:inset 2px 2px 0 var(--panel-hi),inset -2px -2px 0 var(--panel-lo);transition:transform .1s}
+.amts button:hover{transform:translateY(-2px);color:#ffc83d}
+.amts button[aria-pressed="true"]{background:#d99a1a;color:#2b1a00;box-shadow:inset 0 -4px 0 #7a5008,inset 0 2px 0 rgba(255,255,255,.35)}
+.amt-custom{display:block;margin-bottom:6px}
+.amt-custom>span:first-child{display:block;font:500 14px var(--body);color:var(--muted);margin-bottom:6px}
+.amt-field{display:flex;align-items:center;gap:8px;max-width:220px;background:var(--slot);border:3px solid #000;padding:0 12px;box-shadow:inset 3px 3px 0 #000}
+.amt-field b{font:700 22px var(--px);color:#ffc83d}
+.amt-field input{flex:1;min-width:0;width:100%;font:700 22px var(--px);color:var(--ink);background:none;border:0;padding:10px 0;outline:none}
+.amt-field:focus-within{outline:3px solid var(--splash);outline-offset:2px}
+.amt-err{min-height:20px;margin:4px 0 8px;color:#ff6b7a;font-size:14px}
+.mc-btn[aria-disabled="true"]{opacity:.5;pointer-events:none}
+@media(max-width:700px){.sup-card{grid-template-columns:1fr;text-align:center;justify-items:center;padding:28px 20px}.amts{justify-content:center}}
 @media (prefers-reduced-motion:reduce){.yt-btn,.yt-btn::after,.yt-btn .ico,.bell,.yt-play,.fp,.cup,.cup i,.nav-yt::before,.addon.premium::before{animation:none}}
 
 /* steps */
@@ -560,12 +573,18 @@ dialog::backdrop{background:rgba(0,0,0,.72);backdrop-filter:blur(4px)}
           <span class="kick">Support the work</span>
           <h2>Buy me a coffee</h2>
           <p>Every add-on is free and always will be. If you like them and want to help me build the next ones, even the price of a coffee means a lot. Thank you!</p>
-          <div class="iban-box">
-            <span class="iban-lbl">Bank transfer · IBAN</span>
-            <div class="iban-row"><code id="ibanTxt">BE36 9059 4964 7181</code><button class="mc-btn sm gold" type="button" id="ibanCopy">Copy IBAN</button></div>
+          <div class="amt-box" id="amtBox">
+            <span class="iban-lbl">Pick an amount</span>
+            <div class="amts" id="amts" role="group" aria-label="Amount">
+              <button type="button" data-a="1">€1</button><button type="button" data-a="2">€2</button><button type="button" data-a="3">€3</button>
+              <button type="button" data-a="5" aria-pressed="true">€5</button><button type="button" data-a="10">€10</button><button type="button" data-a="15">€15</button><button type="button" data-a="20">€20</button>
+            </div>
+            <label class="amt-custom" for="amtIn"><span>Or write your own</span>
+              <span class="amt-field"><b>€</b><input id="amtIn" type="text" inputmode="decimal" placeholder="e.g. 7.50" maxlength="7" autocomplete="off"></span></label>
+            <p class="amt-err" id="amtErr" role="alert"></p>
+            <a class="mc-btn gold full" id="supMail" href="#support">✉ Contribute €5</a>
           </div>
-          <p class="sup-help">Problems with the payment? Send me an email and I'll sort it out.</p>
-          <a class="mc-btn sm" id="supMail" href="mailto:glitchcraft666yt@gmail.com?subject=%5BCraftGlitch%5D%20Support%20%2F%20payment&body=Hi!%0A%0AI%20wanted%20to%20support%20CraftGlitch.%0A%0AName%20%2F%20Gamertag%3A%20%0AProblem%20(if%20any)%3A%20%0A">✉ Email me</a>
+          <p class="sup-help">This opens a ready-made email to me. I'll reply with the bank details so you can make the transfer. Any problem with the payment? Just write to me there.</p>
         </div>
       </div>
     </div>
@@ -591,7 +610,7 @@ dialog::backdrop{background:rgba(0,0,0,.72);backdrop-filter:blur(4px)}
       <div class="faq">
         <details class="mc-panel"><summary>How fast do you reply?</summary><p>Usually within 24 hours. Check your spam folder if you don't see our reply.</p></details>
         <details class="mc-panel"><summary>What does Premium mean?</summary><p>Premium add-ons are still free to download. The label is for the big ones: extra game modes and more features than a standard add-on.</p></details>
-        <details class="mc-panel"><summary>How can I support you?</summary><p>Add-ons are free, but a coffee always helps. Use the bank transfer details in the Support section, and email us if you have any problem with the payment.</p></details>
+        <details class="mc-panel"><summary>How can I support you?</summary><p>Add-ons are free, but a coffee always helps. Pick an amount in the Support section: it opens a ready-made email to us, and we reply with the bank details.</p></details>
         <details class="mc-panel"><summary>Are the add-ons really free?</summary><p>Yes, every add-on is free. Many have a Download button that gets you the file straight away; for the others, send the email and you get the link.</p></details>
         <details class="mc-panel"><summary>How do I rate an add-on?</summary><p>Request it first. Then open the add-on again and tap the hearts. Each player can rate each add-on once.</p></details>
         <details class="mc-panel"><summary>Do these addons work on Minecraft PE (MCPE)?</summary><p>Yes. All CraftGlitch add-ons are made for Minecraft Bedrock Edition, which includes Minecraft PE on Android and iOS, Windows, Xbox, PlayStation, Switch and Realms.</p></details>
@@ -836,10 +855,41 @@ $("tabs").addEventListener("click", e => {
   filter = b.dataset.f; render();
 });
 document.querySelectorAll('nav a[href="#soon"], nav a[href="#horror"]').forEach(a => a.addEventListener("click", () => { if (filter !== "all"){ filter = "all"; render(); } }));
-$("ibanCopy").addEventListener("click", async () => {
-  try { await navigator.clipboard.writeText("BE36905949647181"); toast("IBAN copied! Thank you ☕"); }
-  catch { const r = document.createRange(); r.selectNodeContents($("ibanTxt")); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); toast("Press copy on the selected IBAN."); }
-});
+/* contribuisci: importo -> email precompilata */
+(() => {
+  const btns = [...document.querySelectorAll("#amts button")], inp = $("amtIn"), mail = $("supMail"), err = $("amtErr");
+  let amt = 5;
+  const fmt = n => "€" + (Number.isInteger(n) ? n : n.toFixed(2));
+  function apply(){
+    const ok = amt >= 1 && amt <= 1000;
+    err.textContent = !ok && inp.value.trim() ? "Write an amount from €1 to €1000." : "";
+    mail.setAttribute("aria-disabled", String(!ok));
+    if (!ok){ mail.textContent = "✉ Choose an amount"; mail.href = "#support"; return; }
+    const subject = "[CraftGlitch] I'd like to contribute", f = fmt(amt);
+    const body = `Hi CraftGlitch!
+
+I'd like to contribute by offering you ${f}.
+Please send me the IBAN so I can make the bank transfer.
+
+Name / Gamertag: 
+
+Thanks!`;
+    mail.textContent = "✉ Contribute " + f;
+    mail.href = `mailto:${MAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  }
+  btns.forEach(b => b.addEventListener("click", () => {
+    amt = Number(b.dataset.a); inp.value = "";
+    btns.forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    apply();
+  }));
+  inp.addEventListener("input", () => {
+    const v = parseFloat(inp.value.replace(",", "."));
+    amt = Number.isFinite(v) ? Math.round(v * 100) / 100 : 0;
+    btns.forEach(x => x.setAttribute("aria-pressed", String(inp.value.trim() === "" && Number(x.dataset.a) === amt)));
+    apply();
+  });
+  apply();
+})();
 [grid, hgrid].forEach(g => g.addEventListener("click", e => {
   const d = e.target.closest("[data-dl]");
   if (d) { e.stopPropagation(); return markDl(d.dataset.dl); }
