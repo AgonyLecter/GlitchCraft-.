@@ -271,8 +271,16 @@ h2{font:700 clamp(32px,4.4vw,48px)/1.05 var(--px);margin:0 0 10px;text-shadow:3p
 .soon .foot{flex-direction:column;align-items:stretch;gap:8px}
 .loadlbl{display:flex;justify-content:space-between;font:600 14px var(--px);color:var(--cyan);letter-spacing:.08em}
 .loadbar{height:18px;background:#030a14;border:2px solid #000;position:relative;overflow:hidden}
-.loadbar i{position:absolute;inset:0 auto 0 0;width:var(--p,60%);background:repeating-linear-gradient(90deg,#19e6ff 0 10px,#0a7f90 10px 12px);box-shadow:0 0 12px rgba(25,230,255,.6);animation:load 3.2s steps(12) infinite alternate}
-@keyframes load{from{width:12%}to{width:var(--p,60%)}}
+.loadbar i{position:absolute;inset:0 auto 0 0;width:0;background:repeating-linear-gradient(90deg,#19e6ff 0 10px,#0a7f90 10px 12px);box-shadow:0 0 12px rgba(25,230,255,.6);transition:width 1.8s steps(14,end)}
+.loadbar i::after{content:"";position:absolute;top:0;bottom:0;right:0;width:6px;background:#fff;box-shadow:0 0 10px 2px #19e6ff;animation:blink .8s steps(1) infinite}
+.loadbar.run::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(100deg,transparent 35%,rgba(255,255,255,.45) 50%,transparent 65%);transform:translateX(-100%);animation:sweep 2.6s ease-in-out 1.9s infinite}
+@keyframes sweep{to{transform:translateX(100%)}}
+.pct{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.pct .num{font:700 40px/1 var(--px);color:#d9faff;text-shadow:0 0 14px rgba(25,230,255,.9),2px 2px 0 #002a33;font-variant-numeric:tabular-nums;min-width:3.2ch}
+.pct .num small{font-size:.5em;margin-left:2px;color:var(--cyan)}
+.pct .st{font:600 13px var(--px);letter-spacing:.14em;color:#9ec4d0;text-align:right}
+.pct .st::before{content:"";display:inline-block;width:8px;height:8px;margin-right:8px;background:var(--cyan);box-shadow:0 0 8px var(--cyan);animation:blink 1s steps(1) infinite;vertical-align:0}
+@media (prefers-reduced-motion:reduce){.loadbar i::after,.loadbar.run::after{animation:none}}
 .soon .date{color:#9ec4d0;font-size:14px}
 
 /* ---------- YOUTUBE ---------- */
@@ -800,7 +808,8 @@ function soonCardHTML(a){
       <p class="tagline">${esc(a.tagline || a.description || "")}</p>
       <div class="foot">
         <div class="loadlbl"><span>LOADING…</span><span>${a.soonDate ? esc(a.soonDate) : "Soon"}</span></div>
-        <div class="loadbar" role="img" aria-label="In development"><i style="--p:${p}%"></i></div>
+        <div class="pct"><span class="num" data-p="${p}" aria-label="${p} percent complete">0<small>%</small></span><span class="st">IN DEVELOPMENT</span></div>
+        <div class="loadbar" role="img" aria-label="${p}% complete"><i data-w="${p}"></i></div>
       </div>
     </article>`;
 }
@@ -829,6 +838,30 @@ function cardHTML(a){
 const isStd = a => !isSoon(a) && !isHorror(a) && !isPremium(a);
 const isPrem = a => !isSoon(a) && !isHorror(a) && isPremium(a);
 const CATS = [["all", "All", () => true], ["std", "Standard", isStd], ["prem", "★ Premium", isPrem], ["horror", "🎃 Horror", isHorror], ["soon", "⏳ Coming Soon", isSoon]];
+const loadObs = "IntersectionObserver" in window ? new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting){ loadObs.unobserve(e.target); runLoad(e.target); } }), { threshold: .35 }) : null;
+function runLoad(card){
+  const num = card.querySelector(".num"), bar = card.querySelector(".loadbar"), fill = card.querySelector(".loadbar i");
+  if (!num || num.dataset.done) return;
+  num.dataset.done = "1";
+  const p = Number(num.dataset.p), dur = matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 1800;
+  const set = v => { num.firstChild.nodeValue = String(v); };
+  fill.style.transition = dur ? "" : "none";
+  fill.style.width = p + "%";
+  bar.classList.add("run");
+  if (!dur){ set(p); return; }
+  const t0 = performance.now();
+  (function step(t){
+    const k = Math.min(1, (t - t0) / dur);
+    set(Math.round(p * (1 - Math.pow(1 - k, 3))));
+    if (k < 1) requestAnimationFrame(step);
+  })(t0);
+}
+function animateLoads(){
+  document.querySelectorAll(".soon .addon, #grid .addon").forEach(c => {
+    if (!c.querySelector(".num")) return;
+    loadObs ? loadObs.observe(c) : runLoad(c);
+  });
+}
 function render(){
   if (addons.length) seoData();
   const soon = addons.filter(isSoon), scary = addons.filter(isHorror);
@@ -844,11 +877,13 @@ function render(){
   sgrid.innerHTML = soon.map(soonCardHTML).join("");
   hgrid.innerHTML = scary.map(cardHTML).join("");
   const list = all ? addons.filter(a => !isHorror(a) && !isSoon(a)) : addons.filter(CATS.find(c => c[0] === filter)[2]);
+  animateLoads();
   if (!list.length){
     grid.innerHTML = `<div class="empty mc-panel"><strong>${addons.length ? (all ? "More add-ons are on the way." : "Nothing here.") : "No add-ons yet."}</strong>${addons.length ? (all ? "Check the sections below." : "Try another filter.") : "New add-ons are on the way. Check back soon."}</div>`;
     return;
   }
   grid.innerHTML = list.map(a => isSoon(a) ? soonCardHTML(a) : cardHTML(a)).join("");
+  animateLoads();
 }
 $("tabs").addEventListener("click", e => {
   const b = e.target.closest("[data-f]"); if (!b) return;
