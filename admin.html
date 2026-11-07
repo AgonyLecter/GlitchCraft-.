@@ -237,7 +237,7 @@ details.more .in{padding:0 22px 22px}
     <div class="cards" id="cards"><div class="empty"><p>Caricamento…</p></div></div>
     <section class="vsec" id="vsec">
       <h2>🎬 Video in alto sul sito</h2>
-      <p>Scegli il file MP4 direttamente dal telefono o dal computer: viene caricato qui e parte da solo sul sito (senza audio). Chi guarda può metterlo in pausa o attivare l'audio. Orizzontali e verticali si adattano da soli. Aggiungi e togli quanti box vuoi (max 12).<br>Peso massimo 30 MB a video; meglio file leggeri (sotto i 10 MB) così si caricano subito anche col 4G.</p>
+      <p>Scegli il video direttamente dal telefono o dal computer: viene salvato nel database e sul sito parte da solo (senza audio). Chi guarda può metterlo in pausa o attivare l'audio. Orizzontali e verticali si adattano da soli. Aggiungi e togli quanti box vuoi (max 12).<br><b>Peso:</b> un video fino a 10 MB viene caricato così com'è. Se è più grande lo comprimo io automaticamente a circa 9 MB (serve Chrome, dura quanto il video, max 2 minuti: tieni la pagina aperta). Il database gratuito ha poco spazio e banda, per questo i video devono restare leggeri.</p>
       <div id="vrows"></div>
       <div class="vbar">
         <button class="btn" type="button" id="vAdd">+ Aggiungi video</button>
@@ -355,16 +355,14 @@ details.more .in{padding:0 22px 22px}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getDatabase, ref, onValue, get, push, set, update, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-import { getStorage, ref as sref, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const _k = ["==QfiI1UChlS2skRzYULHJiOiQWS05WZtVmc1NXY", "l1mIsISM3cDM2Y2Y0IDOhRTZwkDOyU2MxEGM6IWZ", "3pDN4gjN0IjN5ITM0oTMiojIklEcwFmIsICN4gjN", "0IjN5ITM0IiOiQWSyVGZuV2Un5WanF2czVWbiwiI", "t92YuQ3bwNHcwFmLzQTZkVWL09mYvJnblVmcnJiO", "iQXZrNWdCV2ZhJ3b0NnIsIyM0UGZl1CdvJ2by5WZ", "lJ3ZiojIklEdjVmavJHciwiIwBXYuU2chJWY0FGZ", "lNXYiVmcpZmLxQ3cldXLlB3byVXZuIGZ0JXL0xWd", "hZWZk1yM0UGZl1CdvJ2by5WZlJ3Zv8iOzBHd0hmI", "6ICTSVVZzFmYhRXYkJCLi02bj5CcwFWZzFmYlJXa", "m5yM0UGZl1CdvJ2by5WZlJ3ZiojIulWYt9GRoRXd", "hJCLiUEZxZ2UHJTVJJGTkNWdEllT2FFZTxEMTJVe", "QdkQGFGUDl3UhpXSBJiOikXZLlGchJye"];
 const app = initializeApp(JSON.parse(atob(_k.join("").split("").reverse().join(""))));
 const db = getDatabase(app);
 const auth = getAuth(app);
-const storage = getStorage(app);
 const ROOT = "craftglitch";
-const A = ROOT + "/addons", R = ROOT + "/ratings", M = ROOT + "/media", ADMIN = ROOT + "/admin", D = ROOT + "/downloads", V = ROOT + "/videos";
+const A = ROOT + "/addons", R = ROOT + "/ratings", M = ROOT + "/media", ADMIN = ROOT + "/admin", D = ROOT + "/downloads", V = ROOT + "/videos", VF = ROOT + "/vfiles";
 const MAX_PHOTOS = 8;
 const EMOJIS = ["🧩","🛗","🐾","🤖","🌀","⛏️","📦","🗡️","🏠","🔥","💎","🐉","⚡","🧪","🗺️","🎯"];
 const $ = id => document.getElementById(id);
@@ -473,70 +471,121 @@ function checkUser(user){
     renderList();
   }, err => toast("Errore nel leggere gli addon", true)));
   unsubs.push(onValue(ref(db, R), snap => { ratings = snap.val() || {}; renderList(); }));
-  unsubs.push(onValue(ref(db, V), snap => { if (!vDirty){ vids = Object.entries(snap.val() || {}).map(([id, v]) => ({id, url: v.url || "", path: v.path || "", fname: v.fname || "", title: v.title || "", orient: v.orient || "auto", order: v.order ?? 99})).sort((x, y) => x.order - y.order); renderVids(); } }, () => {}));
+  unsubs.push(onValue(ref(db, V), snap => { if (!vDirty){ vids = Object.entries(snap.val() || {}).map(([id, v]) => ({id, url: v.url || "", fid: v.fid || "", chunks: v.chunks || 0, mime: v.mime || "", size: v.size || 0, w: v.w || 0, h: v.h || 0, fname: v.fname || "", title: v.title || "", orient: v.orient || "auto", order: v.order ?? 99})).sort((x, y) => x.order - y.order); renderVids(); } }, () => {}));
   unsubs.push(onValue(ref(db, D), snap => { downloads = snap.val() || {}; renderList(); }, () => {}));
 }
 
 
 /* =================== VIDEO IN ALTO =================== */
 let vids = [], vDirty = false, vTrash = [];
-const MAX_VID = 30 * 1024 * 1024;
-const vidSrc = u => {
-  const x = String(u || "").trim();
-  if (/^https:\/\/firebasestorage\.googleapis\.com\//i.test(x)) return x;
-  if (!/\.(mp4|webm|m4v)(\?.*)?$/i.test(x)) return "";
-  if (/^https:\/\//i.test(x)) return x;
-  return /^[\w\-./ ]+(\?.*)?$/.test(x) && !x.includes("..") && !/^[a-z]+:/i.test(x) ? x : "";
-};
+const CHUNK = 3 * 262144;              /* 786432 byte -> 1 MB di testo base64 */
+const DIRECT_MAX = 10 * 1024 * 1024;   /* sopra questo peso il video viene compresso */
+const TARGET = 9 * 1024 * 1024;        /* peso a cui punta la compressione */
+const mb = n => (n / 1048576).toFixed(1);
 function vMark(){ vDirty = true; $("vMsg").textContent = "Modifiche non salvate"; }
-function storageErr(err){
-  const c = err?.code || "";
-  if (c === "storage/unauthorized" || c === "storage/unauthenticated") return "Permesso negato da Firebase Storage: servono le regole (vedi istruzioni)";
-  if (c === "storage/bucket-not-found" || c === "storage/project-not-found" || c === "storage/unknown") return "Firebase Storage non è attivo: attivalo dalla console Firebase";
-  if (c === "storage/canceled") return "Caricamento annullato";
-  if (c === "storage/retry-limit-exceeded" || c === "storage/network-request-failed") return "Connessione persa durante il caricamento. Riprova";
-  return "Errore nel caricamento: " + (err?.message || c || "sconosciuto");
-}
+function vErr(err){ return err?.code ? errMsg(err) : (err?.message || "Errore sconosciuto"); }
 function renderVids(){
   $("vrows").innerHTML = vids.length ? vids.map((v, i) => {
-    const up = v.up != null, has = !!v.url;
+    const up = v.up != null, has = !!v.fid;
     return `<div class="vrow" data-i="${i}" data-vid="${esc(v.id)}">
-      <div class="vthumb ${v.orient === "v" ? "v" : ""}">${has ? `<video src="${esc(v.url)}#t=0.1" muted playsinline preload="metadata"></video>` : up ? "…" : "Anteprima"}</div>
+      <div class="vthumb ${v.orient === "v" || (v.orient === "auto" && v.h > v.w) ? "v" : ""}">${v.prev ? `<video src="${esc(v.prev)}#t=0.1" muted playsinline preload="metadata"></video>` : has ? "🎞️" : up ? "…" : "Anteprima"}</div>
       <div class="vf">
         <div class="vfile">
           <button class="btn sm" type="button" data-a="pick" ${up ? "disabled" : ""}>${has ? "🔄 Cambia video" : "📁 Scegli il video"}</button>
-          <span class="vname">${up ? "Caricamento… " + v.up + "%" : has ? esc(v.fname || "video caricato") : "Nessun file (MP4 o WebM, max 30 MB)"}</span>
+          <span class="vname">${up ? esc(v.stage || "Carico…") : has ? esc((v.fname || "video") + " · " + mb(v.size) + " MB") : "Nessun file (MP4 o WebM)"}</span>
           <input type="file" data-f="file" accept="video/mp4,video/webm,.mp4,.webm,.m4v" hidden>
         </div>
         ${up ? `<div class="vprog"><i style="width:${v.up}%"></i></div>` : ""}
         <div class="two2"><input data-f="title" maxlength="50" placeholder="Titolo (facoltativo)" value="${esc(v.title)}" aria-label="Titolo video ${i + 1}">
           <select data-f="orient" aria-label="Formato"><option value="auto"${v.orient === "auto" ? " selected" : ""}>Formato: auto</option><option value="h"${v.orient === "h" ? " selected" : ""}>Orizzontale</option><option value="v"${v.orient === "v" ? " selected" : ""}>Verticale</option></select></div>
       </div>
-      <div class="vact"><button class="iconbtn" type="button" data-a="up" ${i === 0 ? "disabled" : ""} aria-label="Sposta su">↑</button><button class="iconbtn" type="button" data-a="dn" ${i === vids.length - 1 ? "disabled" : ""} aria-label="Sposta giù">↓</button><button class="iconbtn del" type="button" data-a="del" aria-label="Elimina">✕</button></div>
+      <div class="vact"><button class="iconbtn" type="button" data-a="up" ${i === 0 ? "disabled" : ""} aria-label="Sposta su">↑</button><button class="iconbtn" type="button" data-a="dn" ${i === vids.length - 1 ? "disabled" : ""} aria-label="Sposta giù">↓</button><button class="iconbtn del" type="button" data-a="del" ${up ? "disabled" : ""} aria-label="Elimina">✕</button></div>
     </div>`;
   }).join("") : '<div class="empty" style="padding:26px"><p style="margin:0">Nessun video: la sezione non compare sul sito.</p></div>';
 }
-function vUpload(v, file){
+function setProg(v, pct, text){
+  v.up = Math.round(pct); v.stage = text;
+  const row = $("vrows").querySelector(`.vrow[data-vid="${CSS.escape(v.id)}"]`);
+  row?.querySelector(".vprog i")?.style.setProperty("width", v.up + "%");
+  const nm = row?.querySelector(".vname"); if (nm) nm.textContent = text;
+}
+function probe(file){
+  return new Promise((res, rej) => {
+    const el = document.createElement("video"), u = URL.createObjectURL(file);
+    el.preload = "metadata"; el.muted = true;
+    el.onloadedmetadata = () => { const r = {w: el.videoWidth, h: el.videoHeight, dur: el.duration}; URL.revokeObjectURL(u); res(r); };
+    el.onerror = () => { URL.revokeObjectURL(u); rej(new Error("Il browser non riesce a leggere questo video. Prova un MP4 (H.264)")); };
+    el.src = u;
+  });
+}
+/* rimpicciolisce e ricomprime il video nel browser (dura quanto il video: tieni la pagina aperta) */
+async function compressVideo(file, meta, onProg){
+  if (!window.MediaRecorder || !HTMLCanvasElement.prototype.captureStream) throw new Error("Questo browser non può comprimere i video. Usa Chrome o scegli un video sotto 10 MB");
+  if (meta.dur > 120) throw new Error("Il video dura " + Math.round(meta.dur) + " secondi: il massimo è 2 minuti");
+  const url = URL.createObjectURL(file), el = document.createElement("video");
+  el.src = url; el.playsInline = true; el.preload = "auto";
+  await new Promise((res, rej) => { el.oncanplay = res; el.onerror = () => rej(new Error("Video non leggibile")); });
+  const sc = Math.min(1, 1280 / Math.max(el.videoWidth, el.videoHeight));
+  const w = Math.max(2, Math.round(el.videoWidth * sc / 2) * 2), h = Math.max(2, Math.round(el.videoHeight * sc / 2) * 2);
+  const cv = document.createElement("canvas"); cv.width = w; cv.height = h;
+  const cx = cv.getContext("2d"), stream = cv.captureStream(30);
+  let ac = null;
+  try {
+    ac = new AudioContext();
+    const dest = ac.createMediaStreamDestination();
+    ac.createMediaElementSource(el).connect(dest);
+    dest.stream.getAudioTracks().forEach(t => stream.addTrack(t));
+    await ac.resume();
+  } catch {}
+  const mime = ["video/mp4;codecs=avc1.42E01E,mp4a.40.2", "video/mp4", "video/webm;codecs=vp9,opus", "video/webm;codecs=vp8,opus", "video/webm"].find(m => MediaRecorder.isTypeSupported(m));
+  if (!mime) throw new Error("Questo browser non può comprimere i video. Usa Chrome o scegli un video sotto 10 MB");
+  const vbps = Math.round(Math.max(4e5, Math.min(4e6, TARGET * 8 * .9 / meta.dur - 96e3)));
+  const rec = new MediaRecorder(stream, {mimeType: mime, videoBitsPerSecond: vbps, audioBitsPerSecond: 96e3});
+  const parts = []; rec.ondataavailable = e => { if (e.data.size) parts.push(e.data); };
+  const stopped = new Promise(res => { rec.onstop = res; });
+  let over = false;
+  const draw = () => {
+    if (over) return;
+    cx.drawImage(el, 0, 0, w, h); onProg(Math.min(.99, el.currentTime / meta.dur));
+    el.requestVideoFrameCallback ? el.requestVideoFrameCallback(draw) : requestAnimationFrame(draw);
+  };
+  el.onended = () => { over = true; setTimeout(() => rec.state !== "inactive" && rec.stop(), 250); };
+  rec.start(1000);
+  await el.play(); draw();
+  await stopped;
+  try { ac?.close(); } catch {} URL.revokeObjectURL(url);
+  if (!parts.length) throw new Error("La compressione non ha prodotto nessun video");
+  return {blob: new Blob(parts, {type: mime.split(";")[0]}), w, h};
+}
+const blobB64 = (blob, i) => new Promise((res, rej) => {
+  const r = new FileReader(); r.onload = () => res(String(r.result).split(",")[1]); r.onerror = () => rej(r.error);
+  r.readAsDataURL(blob.slice(i * CHUNK, (i + 1) * CHUNK));
+});
+async function vProcess(v, file){
   const ext = (file.name.match(/\.(mp4|webm|m4v)$/i) || [])[1]?.toLowerCase();
   if (!ext) return toast("Serve un file .mp4 o .webm", true);
-  if (file.size > MAX_VID) return toast(`Il video pesa ${(file.size / 1048576).toFixed(1)} MB: il massimo è 30 MB`, true);
-  const path = `${ROOT}/videos/${Date.now()}_${Math.random().toString(36).slice(2, 7)}.${ext === "webm" ? "webm" : "mp4"}`;
-  const task = uploadBytesResumable(sref(storage, path), file, {contentType: ext === "webm" ? "video/webm" : "video/mp4", cacheControl: "public,max-age=31536000"});
-  v.up = 0; v._task = task; renderVids();
-  task.on("state_changed", snap => {
-    v.up = Math.round(100 * snap.bytesTransferred / snap.totalBytes);
-    const row = $("vrows").querySelector(`.vrow[data-vid="${CSS.escape(v.id)}"]`);
-    row?.querySelector(".vprog i")?.style.setProperty("width", v.up + "%");
-    const nm = row?.querySelector(".vname"); if (nm) nm.textContent = "Caricamento… " + v.up + "%";
-  }, err => { v.up = null; v._task = null; if (err?.code !== "storage/canceled") toast(storageErr(err), true); renderVids(); },
-  async () => {
-    try {
-      const url = await getDownloadURL(task.snapshot.ref);
-      if (v.path) vTrash.push(v.path);
-      Object.assign(v, {url, path, fname: file.name, up: null, _task: null}); vMark();
-    } catch (err) { v.up = null; toast(storageErr(err), true); }
-    renderVids();
-  });
+  setProg(v, 0, "Controllo il video…"); renderVids();
+  const fid = "f" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  try {
+    const meta = await probe(file);
+    let blob = file, mime = ext === "webm" ? "video/webm" : "video/mp4", w = meta.w, h = meta.h;
+    if (file.size > DIRECT_MAX){
+      const out = await compressVideo(file, meta, p => setProg(v, p * 100, `Comprimo… ${Math.round(p * 100)}% (tieni la pagina aperta)`));
+      blob = out.blob; mime = blob.type; w = out.w; h = out.h;
+    }
+    const n = Math.ceil(blob.size / CHUNK); let done = 0, next = 0;
+    setProg(v, 0, `Carico ${mb(blob.size)} MB… 0%`);
+    const worker = async () => { while (next < n){ const i = next++; await set(ref(db, `${VF}/${fid}/${i}`), await blobB64(blob, i)); done++; setProg(v, 100 * done / n, `Carico ${mb(blob.size)} MB… ${Math.round(100 * done / n)}%`); } };
+    await Promise.all([worker(), worker(), worker()]);
+    if (v.fid) vTrash.push(v.fid);
+    if (v.prev) URL.revokeObjectURL(v.prev);
+    Object.assign(v, {fid, chunks: n, mime, size: blob.size, w, h, fname: file.name, prev: URL.createObjectURL(blob), up: null, stage: ""});
+    vMark(); toast("Video caricato: ricordati di premere Salva video");
+  } catch (err) {
+    set(ref(db, `${VF}/${fid}`), null).catch(() => {});
+    v.up = null; v.stage = ""; toast(vErr(err), true);
+  }
+  renderVids();
 }
 $("vrows").addEventListener("input", e => {
   const row = e.target.closest(".vrow"), f = e.target.dataset.f; if (!row || !f || f === "file") return;
@@ -545,31 +594,30 @@ $("vrows").addEventListener("input", e => {
 $("vrows").addEventListener("change", e => {
   const row = e.target.closest(".vrow"); if (!row) return;
   const f = e.target.dataset.f;
-  if (f === "file"){ const file = e.target.files[0]; if (file) vUpload(vids[+row.dataset.i], file); }
+  if (f === "file"){ const file = e.target.files[0]; if (file) vProcess(vids[+row.dataset.i], file); }
   else if (f === "orient") renderVids();
 });
 $("vrows").addEventListener("click", e => {
   const b = e.target.closest("[data-a]"); if (!b) return;
   const row = b.closest(".vrow"), i = +row.dataset.i, v = vids[i];
   if (b.dataset.a === "pick"){ row.querySelector('[data-f="file"]').click(); return; }
-  if (b.dataset.a === "del"){
-    v._task?.cancel(); if (v.path) vTrash.push(v.path); vids.splice(i, 1);
-  } else { const j = b.dataset.a === "up" ? i - 1 : i + 1; [vids[i], vids[j]] = [vids[j], vids[i]]; }
+  if (b.dataset.a === "del"){ if (v.fid) vTrash.push(v.fid); vids.splice(i, 1); }
+  else { const j = b.dataset.a === "up" ? i - 1 : i + 1; [vids[i], vids[j]] = [vids[j], vids[i]]; }
   vMark(); renderVids();
 });
 $("vAdd").addEventListener("click", () => {
   if (vids.length >= 12) return toast("Massimo 12 video", true);
-  vids.push({id: "n" + Date.now(), url: "", path: "", fname: "", title: "", orient: "auto", up: null}); vMark(); renderVids();
+  vids.push({id: "n" + Date.now(), fid: "", chunks: 0, mime: "", size: 0, w: 0, h: 0, fname: "", title: "", orient: "auto", up: null}); vMark(); renderVids();
 });
 $("vSave").addEventListener("click", async () => {
   if (vids.some(v => v.up != null)) return toast("Aspetta la fine del caricamento", true);
-  const list = vids.filter(v => v.url);
+  const list = vids.filter(v => v.fid);
   const btn = $("vSave"); btn.disabled = true;
   try {
-    const obj = {}; list.forEach((v, i) => { obj[push(ref(db, V)).key] = {url: v.url, path: v.path || "", fname: v.fname || "", title: v.title.trim(), orient: v.orient || "auto", order: i, visible: true}; });
+    const obj = {}; list.forEach((v, i) => { obj[push(ref(db, V)).key] = {fid: v.fid, chunks: v.chunks, mime: v.mime, size: v.size, w: v.w || 0, h: v.h || 0, fname: v.fname || "", title: v.title.trim(), orient: v.orient || "auto", order: i, visible: true}; });
     await set(ref(db, V), list.length ? obj : null);
-    const keep = new Set(list.map(v => v.path));
-    vTrash.filter(p => p && !keep.has(p)).forEach(p => deleteObject(sref(storage, p)).catch(() => {}));
+    const keep = new Set(list.map(v => v.fid));
+    [...new Set(vTrash)].filter(f => f && !keep.has(f)).forEach(f => set(ref(db, `${VF}/${f}`), null).catch(() => {}));
     vTrash = []; vDirty = false; $("vMsg").textContent = ""; toast("Video salvati!");
   } catch (err) { toast(errMsg(err), true); }
   btn.disabled = false;
