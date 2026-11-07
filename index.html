@@ -241,6 +241,61 @@ h2{font:700 clamp(32px,4.4vw,48px)/1.05 var(--px);margin:0 0 10px;text-shadow:3p
 .empty{grid-column:1/-1;padding:48px;text-align:center;color:var(--muted)}
 .empty strong{display:block;color:var(--ink);font:700 24px var(--px);margin-bottom:6px}
 
+
+/* ---------- COMING SOON ---------- */
+.soon{position:relative;overflow:hidden;padding:84px 0 88px;
+  background:radial-gradient(110% 60% at 50% 0%,rgba(25,230,255,.2),transparent 62%),linear-gradient(#05030f,#061226 18%,#061226 82%,#05030f)}
+.soon::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(25,230,255,.07) 3px 4px),radial-gradient(ellipse at center,transparent 45%,rgba(0,0,0,.7) 100%)}
+.soon .scan{position:absolute;left:0;right:0;height:120px;top:-120px;pointer-events:none;
+  background:linear-gradient(transparent,rgba(25,230,255,.12),transparent);animation:scan 7s linear infinite}
+@keyframes scan{to{top:100%}}
+.soon .wrap{position:relative}
+.soon .kick{display:inline-block;font:600 14px var(--body);letter-spacing:.2em;text-transform:uppercase;color:var(--cyan);margin-bottom:10px}
+.soon h2{font:700 clamp(38px,6vw,64px)/1 var(--px);margin:0 0 10px;color:#d9faff;letter-spacing:.02em;
+  text-shadow:0 0 18px rgba(25,230,255,.85),3px 3px 0 #002a33,-2px 0 rgba(228,59,255,.5)}
+.soon h2 .blink{display:inline-block;width:.5em;height:.1em;background:var(--cyan);margin-left:.15em;animation:blink 1s steps(1) infinite;box-shadow:0 0 10px var(--cyan)}
+@keyframes blink{50%{opacity:0}}
+.soon .sub{color:#9ec4d0}
+.soon .addon{--accent:var(--cyan);cursor:default;background:#0a1a2e;box-shadow:inset 3px 3px 0 #1d4566,inset -3px -3px 0 #030a14}
+.soon .addon:hover{transform:none}
+.soon .addon .cover img{filter:grayscale(.7) brightness(.45) blur(3px);transform:scale(1.1)}
+.soon .addon:hover .cover img{transform:scale(1.1)}
+.soon .cover::after{content:"?";position:absolute;inset:0;display:grid;place-items:center;font:700 64px var(--px);color:var(--cyan);text-shadow:0 0 20px var(--cyan),3px 3px 0 #002a33;
+  background:repeating-linear-gradient(45deg,rgba(0,0,0,.3) 0 6px,transparent 6px 12px);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.5}}
+.soon .addon .slot{background:#030a14;box-shadow:inset 3px 3px 0 #000,inset -3px -3px 0 #1d4566;filter:grayscale(.5)}
+.soon .addon .tagline{color:#b9dbe6}
+.soon .ribbon{background:var(--cyan);color:#002a33}
+.soon .foot{flex-direction:column;align-items:stretch;gap:8px}
+.loadlbl{display:flex;justify-content:space-between;font:600 14px var(--px);color:var(--cyan);letter-spacing:.08em}
+.loadbar{height:18px;background:#030a14;border:2px solid #000;position:relative;overflow:hidden}
+.loadbar i{position:absolute;inset:0 auto 0 0;width:var(--p,60%);background:repeating-linear-gradient(90deg,#19e6ff 0 10px,#0a7f90 10px 12px);box-shadow:0 0 12px rgba(25,230,255,.6);animation:load 3.2s steps(12) infinite alternate}
+@keyframes load{from{width:12%}to{width:var(--p,60%)}}
+.soon .date{color:#9ec4d0;font-size:14px}
+
+/* ---------- YOUTUBE ---------- */
+.yt{padding:64px 0}
+.yt-card{--yt:#ff1f2e;position:relative;overflow:hidden;display:grid;grid-template-columns:auto 1fr auto;gap:30px;align-items:center;padding:32px 36px;
+  background:linear-gradient(120deg,#2d0609 0%,#1d1733 65%);border:3px solid #000;
+  box-shadow:inset 3px 3px 0 #6a1d26,inset -3px -3px 0 #0b0717}
+.yt-card::before{content:"";position:absolute;left:3px;right:3px;top:3px;height:5px;background:var(--yt)}
+.yt-card::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.25;
+  background:repeating-linear-gradient(90deg,transparent 0 38px,rgba(255,255,255,.04) 38px 40px)}
+.yt-play{position:relative;z-index:1;width:104px;height:74px;flex:none;display:grid;place-items:center;background:var(--yt);border:3px solid #000;
+  box-shadow:inset 0 -6px 0 #9c0d19,inset 0 3px 0 rgba(255,255,255,.35),0 0 30px rgba(255,31,46,.5);animation:ytpulse 2.4s ease-in-out infinite}
+.yt-play svg{width:38px;height:38px;fill:#fff;filter:drop-shadow(3px 3px 0 rgba(0,0,0,.4))}
+@keyframes ytpulse{50%{transform:scale(1.06) rotate(-2deg)}}
+.yt-copy{position:relative;z-index:1}
+.yt-copy .kick{display:inline-block;font:600 14px var(--body);letter-spacing:.2em;text-transform:uppercase;color:#ff6b75;margin-bottom:6px}
+.yt-copy h2{margin:0 0 8px;font-size:clamp(28px,4vw,42px)}
+.yt-copy p{margin:0;color:var(--muted);max-width:34em}
+.yt-copy .handle{color:var(--splash);font:600 18px var(--px)}
+.yt-card .mc-btn{position:relative;z-index:1}
+.mc-btn.yt-btn{--b:#e0212e;--bd:#8a0c16}
+@media(max-width:780px){.yt-card{grid-template-columns:1fr;text-align:center;justify-items:center;padding:28px 22px}}
+.nav-yt{color:#ff6b75!important}
+
 /* steps */
 .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;padding:0;margin:0}
 .steps li{list-style:none;padding:26px}
@@ -361,6 +416,8 @@ dialog::backdrop{background:rgba(0,0,0,.72);backdrop-filter:blur(4px)}
     <nav aria-label="Main">
       <a href="#addons">Add-ons</a>
       <a href="#horror" id="navHorror" hidden>Horror</a>
+      <a href="#soon" id="navSoon" hidden>Coming Soon</a>
+      <a href="https://youtube.com/@craftglitch666?si=TNXG_9ueAc4gD1ki" class="nav-yt" target="_blank" rel="noopener">YouTube</a>
       <a href="#how">How it works</a>
       <a href="#faq">FAQ</a>
     </nav>
@@ -376,6 +433,7 @@ dialog::backdrop{background:rgba(0,0,0,.72);backdrop-filter:blur(4px)}
         <p class="lead">Elevators, pet chests, bots, teleporters and auto-miners for your Minecraft PE / Bedrock world. Pick an add-on, send us an email and it lands in your inbox.</p>
         <div class="ctas">
           <a class="mc-btn green" href="#addons">Browse add-ons</a>
+          <a class="mc-btn yt-btn" href="https://youtube.com/@craftglitch666?si=TNXG_9ueAc4gD1ki" target="_blank" rel="noopener">▶ Watch on YouTube</a>
           <a class="mc-btn" href="#how">How it works</a>
         </div>
       </div>
@@ -417,6 +475,30 @@ dialog::backdrop{background:rgba(0,0,0,.72);backdrop-filter:blur(4px)}
       <h2><span class="drip">Horror</span> Add-ons</h2>
       <p class="sub">Scary MCPE add-ons for Minecraft Bedrock: monsters, jumpscares and nights you won't forget.</p>
       <div class="grid" id="hgrid"></div>
+    </div>
+  </section>
+
+  <section class="soon" id="soon" hidden>
+    <div class="scan" aria-hidden="true"></div>
+    <div class="wrap">
+      <span class="kick">Loading new content</span>
+      <h2>Coming Soon<span class="blink" aria-hidden="true"></span></h2>
+      <p class="sub">The next MCPE add-ons are being built right now. Watch the progress bars and follow the channel to see them first.</p>
+      <div class="grid" id="sgrid"></div>
+    </div>
+  </section>
+
+  <section class="yt" id="youtube">
+    <div class="wrap">
+      <div class="yt-card">
+        <div class="yt-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        <div class="yt-copy">
+          <span class="kick">Main channel</span>
+          <h2>Watch us on YouTube</h2>
+          <p>Every add-on, showcase and MCPE trick lands first on the channel. <span class="handle">@craftglitch666</span> — subscribe so you don't miss the next drop.</p>
+        </div>
+        <a class="mc-btn yt-btn" href="https://youtube.com/@craftglitch666?si=TNXG_9ueAc4gD1ki" target="_blank" rel="noopener">▶ Subscribe</a>
+      </div>
     </div>
   </section>
 
@@ -529,7 +611,7 @@ import("https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js")
 const MAIL = ["glitchcraft666yt", "gmail.com"].join("@");
 const ROOT = "craftglitch";
 const $ = id => document.getElementById(id);
-const grid = $("grid"), hgrid = $("hgrid");
+const grid = $("grid"), hgrid = $("hgrid"), sgrid = $("sgrid");
 let addons = [], ratings = {}, filter = "all", current = null, tab = "overview", galIdx = 0, voting = false;
 
 /* ---------- helpers ---------- */
@@ -601,7 +683,7 @@ onAuthStateChanged(auth, () => { if (current) renderRate(); });
 /* ---------- SEO: add-ons as structured data ---------- */
 function seoData(){
   const base = location.origin + location.pathname;
-  const items = addons.map((a, i) => {
+  const items = addons.filter(a => !isSoon(a)).map((a, i) => {
     const {n, avg} = stats(a.id), img = safeUrl(a.icon || a.image);
     const app = {"@type": "SoftwareApplication", name: a.name, applicationCategory: "GameApplication", applicationSubCategory: isHorror(a) ? "Minecraft Bedrock Horror Add-on" : "Minecraft Bedrock Add-on",
       operatingSystem: "Minecraft Bedrock Edition (Android, iOS, Windows, Xbox, PlayStation, Switch)",
@@ -617,7 +699,23 @@ function seoData(){
 }
 
 /* ---------- grid ---------- */
-const isHorror = a => !!a.horror;
+const isHorror = a => !!a.horror && !a.soon;
+const isSoon = a => !!a.soon;
+function soonCardHTML(a){
+  const cov = imgSrc(a.icon || a.image);
+  const p = Math.min(95, Math.max(5, Number(a.progress) || 60));
+  return `<article class="addon mc-panel" data-color="${esc(a.color || "cyan")}">
+      <span class="ribbon">${esc(a.tag || "SOON")}</span>
+      ${cov ? `<div class="cover"><img src="${esc(cov)}" alt="${esc(a.name)} – upcoming MCPE add-on" loading="lazy"></div>` : ""}
+      <div class="head">${cov ? "" : `<div class="slot">${iconHTML(a)}</div>`}
+        <div><h3>${esc(a.name)}</h3></div></div>
+      <p class="tagline">${esc(a.tagline || a.description || "")}</p>
+      <div class="foot">
+        <div class="loadlbl"><span>LOADING…</span><span>${a.soonDate ? esc(a.soonDate) : "Soon"}</span></div>
+        <div class="loadbar" role="img" aria-label="In development"><i style="--p:${p}%"></i></div>
+      </div>
+    </article>`;
+}
 function cardHTML(a){
   const free = isFree(a), h = isHorror(a);
   const cov = imgSrc(a.icon || a.image);
@@ -642,10 +740,13 @@ function cardHTML(a){
 }
 function render(){
   if (addons.length) seoData();
+  const soon = addons.filter(isSoon);
+  $("soon").hidden = $("navSoon").hidden = !soon.length;
+  sgrid.innerHTML = soon.map(soonCardHTML).join("");
   const scary = addons.filter(isHorror);
   $("horror").hidden = $("navHorror").hidden = !scary.length;
   hgrid.innerHTML = scary.map(cardHTML).join("");
-  const list = addons.filter(a => !isHorror(a) && (filter === "all" || (filter === "free" ? isFree(a) : !isFree(a))));
+  const list = addons.filter(a => !isHorror(a) && !isSoon(a) && (filter === "all" || (filter === "free" ? isFree(a) : !isFree(a))));
   if (!list.length){
     grid.innerHTML = `<div class="empty mc-panel"><strong>${addons.length ? "Nothing here." : "No add-ons yet."}</strong>${addons.length ? "Try another filter." : "New add-ons are on the way. Check back soon."}</div>`;
     return;
