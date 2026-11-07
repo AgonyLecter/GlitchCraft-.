@@ -142,6 +142,12 @@ label.lbl{display:block;font-weight:700;margin-bottom:6px}
 .sec.spook h2{color:#ffd9d9;text-shadow:0 0 12px rgba(212,20,31,.8)}
 .sec.spook .n{background:#d4141f;color:#fff}
 .sec.spook .switch input:checked+.tr{background:#d4141f;box-shadow:0 0 14px rgba(212,20,31,.7)}
+.tag.soon{background:#19e6ff;color:#002a33}
+.card.soon{border-left-color:#19e6ff;background:linear-gradient(90deg,#08202e,var(--panel) 40%)}
+.sec.soonsec{background:linear-gradient(135deg,#061a2a,#040a14);box-shadow:inset 0 0 40px rgba(25,230,255,.18)}
+.sec.soonsec h2{color:#d9faff;text-shadow:0 0 12px rgba(25,230,255,.8)}
+.sec.soonsec .n{background:#19e6ff;color:#002a33}
+.sec.soonsec .switch input:checked+.tr{background:#19e6ff;box-shadow:0 0 14px rgba(25,230,255,.7)}
 .tag.horror{background:#d4141f;color:#fff}
 .card.horror{border-left-color:#d4141f;background:linear-gradient(90deg,#1f070b,var(--panel) 40%)}
 details.more{background:var(--panel);border:3px solid #000;margin-bottom:16px}
@@ -267,6 +273,18 @@ details.more .in{padding:0 22px 22px}
       <h2><span class="n">🎃</span>Sezione Horror</h2>
       <p class="help">Accendi se è un addon horror: sul sito finisce nella sezione Horror (rossa, con nebbia e occhi) invece che nella lista normale.</p>
       <label class="switch"><input type="checkbox" id="fHorror"><span class="tr"></span><span>Addon horror</span></label>
+    </section>
+
+    <section class="sec soonsec">
+      <h2><span class="n">⏳</span>Coming Soon</h2>
+      <p class="help">Accendi se l'addon non è ancora uscito: sul sito va nella sezione "Coming Soon" (azzurra, con barra di caricamento), senza pulsante Download né Richiedi.</p>
+      <label class="switch"><input type="checkbox" id="fSoon"><span class="tr"></span><span>Addon in arrivo</span></label>
+      <div id="soonOpts" hidden style="margin-top:18px">
+        <div class="two">
+          <div class="field"><label class="lbl" for="fSoonDate">Quando esce <span class="help">Es. "Dec 2026" o "Next week"</span></label><input id="fSoonDate" maxlength="20" placeholder="Dec 2026"></div>
+          <div class="field"><label class="lbl" for="fProg">Avanzamento (%) <span class="help">Barra di caricamento, da 5 a 95</span></label><input id="fProg" type="number" inputmode="numeric" min="5" max="95" placeholder="60"></div>
+        </div>
+      </div>
     </section>
 
     <details class="more">
@@ -436,7 +454,7 @@ const colorVar = c => `var(--${c === "magenta" ? "mag" : c === "violet" ? "vio" 
 
 function renderList(){
   const free = addons.filter(isFree).length;
-  $("summary").textContent = addons.length ? `${addons.length} addon · ${free} gratis · ${addons.length - free} a pagamento · ${addons.filter(a => a.horror).length} horror · ⬇ ${addons.reduce((n, a) => n + (+downloads[a.id] || 0), 0)} download` : "";
+  $("summary").textContent = addons.length ? `${addons.length} addon · ${free} gratis · ${addons.length - free} a pagamento · ${addons.filter(a => a.horror).length} horror · ${addons.filter(a => a.soon).length} in arrivo · ⬇ ${addons.reduce((n, a) => n + (+downloads[a.id] || 0), 0)} download` : "";
   if (!addons.length){
     $("cards").innerHTML = `<div class="empty"><h2>Ancora nessun addon</h2><p>Puoi partire dai 5 addon già pronti (Elevator, PetChest, Bot, Teleport, AutoMiner) e poi modificarli.</p>
       <div class="row"><button class="btn green big" id="seed">Usa i 5 addon pronti</button><button class="btn big" id="add2">+ Crea da zero</button></div></div>`;
@@ -445,10 +463,10 @@ function renderList(){
   }
   $("cards").innerHTML = addons.map((a, i) => {
     const r = rstats(a.id);
-    return `<div class="card ${a.visible === false ? "off" : ""} ${a.horror ? "horror" : ""}" style="--c:${colorVar(a.color)}">
+    return `<div class="card ${a.visible === false ? "off" : ""} ${a.horror ? "horror" : ""} ${a.soon ? "soon" : ""}" style="--c:${colorVar(a.color)}">
       <div class="slot">${iconHTML(a)}</div>
       <div class="info"><h3>${esc(a.name)}</h3>
-        <div class="meta">${a.visible === false ? '<span class="tag off">Nascosto</span>' : ""}${a.horror ? '<span class="tag horror">🎃 Horror</span>' : ""}${a.tag ? `<span class="tag">${esc(a.tag)}</span>` : ""}
+        <div class="meta">${a.visible === false ? '<span class="tag off">Nascosto</span>' : ""}${a.horror ? '<span class="tag horror">🎃 Horror</span>' : ""}${a.soon ? '<span class="tag soon">⏳ Coming Soon</span>' : ""}${a.tag ? `<span class="tag">${esc(a.tag)}</span>` : ""}
           <span>❤ ${r.n ? `<b>${r.avg.toFixed(1)}</b> (${r.n} voti)` : "nessun voto"}</span>
           <span>📷 ${a.photos || 0} foto</span>${isFree(a) && a.download ? `<span>⬇ <b>${+downloads[a.id] || 0}</b> download</span>` : ""}</div></div>
       <div class="price ${isFree(a) ? "free" : ""}">${isFree(a) ? "GRATIS" : cube + " " + num(a.price)}</div>
@@ -514,6 +532,8 @@ function openEditor(a){
   $("fVer").value = a?.version || ""; $("fMc").value = a?.mcVersion || ""; $("fSize").value = a?.size || ""; $("fTag").value = a?.tag || "";
   $("fVisible").checked = a ? a.visible !== false : true;
   $("fHorror").checked = !!a?.horror;
+  $("fSoon").checked = !!a?.soon; $("fSoonDate").value = a?.soonDate || ""; $("fProg").value = a?.progress || "";
+  $("soonOpts").hidden = !$("fSoon").checked;
   $("eErr").textContent = "";
   document.querySelector("details.more").open = false;
   renderIcon(); renderPrice(); renderColors(); renderPhotos();
@@ -638,7 +658,7 @@ $("saveBtn").addEventListener("click", async () => {
     tagline: val("fTagline"), description: $("fDesc").value.trim(), video: val("fVideo"),
     features: lines($("fFeat").value), howTo: lines($("fHow").value), changelog: lines($("fLog").value),
     version: val("fVer"), mcVersion: val("fMc"), size: val("fSize"), tag: val("fTag"),
-    color: ed.color, visible: $("fVisible").checked, horror: $("fHorror").checked, download: ed.free && dl ? dl : null, photos: ed.photos.length, gallery: null, updatedAt: Date.now()
+    color: ed.color, visible: $("fVisible").checked, horror: $("fHorror").checked, soon: $("fSoon").checked, soonDate: $("fSoonDate").value.trim() || null, progress: $("fSoon").checked ? (Math.min(95, Math.max(5, parseInt($("fProg").value) || 60))) : null, download: ed.free && dl ? dl : null, photos: ed.photos.length, gallery: null, updatedAt: Date.now()
   };
   const id = ed.id || push(ref(db, A)).key;
   if (!ed.id) data.order = addons.length ? Math.max(...addons.map(a => a.order ?? 0)) + 1 : 0;
@@ -661,6 +681,7 @@ function toast(msg, bad){
   const t = $("toast"); t.textContent = msg; t.classList.toggle("bad", !!bad); t.classList.add("show");
   clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 2800);
 }
+$("fSoon").addEventListener("change", () => { $("soonOpts").hidden = !$("fSoon").checked; });
 </script>
 </body>
 </html>
