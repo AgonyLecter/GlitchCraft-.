@@ -238,15 +238,11 @@ details.more .in{padding:0 22px 22px}
     </section>
 
     <section class="sec">
-      <h2><span class="n">2</span>Prezzo</h2>
-      <p class="help">Il cliente ti scrive per email: se è gratis gli mandi il link, se è a pagamento prima l'IBAN.</p>
+      <h2><span class="n">2</span>Tipo e download</h2>
+      <p class="help">Tutti gli addon sono gratis. "Premium" è l'etichetta per gli addon super fighi con modalità extra: sul sito la card diventa dorata.</p>
       <div class="choice" role="group" aria-label="Tipo">
-        <button type="button" id="cFree" aria-pressed="true">Gratis<small>Il cliente riceve subito il link</small></button>
-        <button type="button" id="cPaid" aria-pressed="false">A pagamento<small>Il cliente paga con bonifico</small></button>
-      </div>
-      <div class="field" id="priceWrap" hidden>
-        <label class="lbl" for="fPrice">Quanti cubi costa? <span class="help">1 cubo = 1 €</span></label>
-        <div class="price-in"><svg class="cube"><use href="#cube"/></svg><input id="fPrice" type="text" inputmode="decimal" placeholder="2.99"></div>
+        <button type="button" id="cFree" aria-pressed="true">Normale<small>Addon standard</small></button>
+        <button type="button" id="cPaid" aria-pressed="false">★ Premium<small>Addon speciale con modalità extra</small></button>
       </div>
       <div class="field" id="dlWrap"><label class="lbl" for="fDl">Link download diretto <span class="help">Facoltativo. Incolla il link MediaFire (o altro, deve iniziare con https://): sul sito compare il pulsante "Download" e il cliente scarica subito, senza email. Lascia vuoto per usare l'email.</span></label><input id="fDl" type="url" placeholder="https://www.mediafire.com/file/…"></div>
     </section>
@@ -340,12 +336,12 @@ const MAX_PHOTOS = 8;
 const EMOJIS = ["🧩","🛗","🐾","🤖","🌀","⛏️","📦","🗡️","🏠","🔥","💎","🐉","⚡","🧪","🗺️","🎯"];
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const isFree = a => a.free || !Number(a.price);
+const isFree = a => true;
 const num = n => Number(n).toLocaleString("it-IT", {maximumFractionDigits: 2});
 const cube = '<svg class="cube"><use href="#cube"/></svg>';
 
 const DEFAULTS = [
-  {name:"Elevator", emoji:"🛗", color:"cyan", free:false, price:2.99, version:"1.0", mcVersion:"1.21+", size:"", tag:"",
+  {name:"Elevator", emoji:"🛗", color:"cyan", free:true, price:0, version:"1.0", mcVersion:"1.21+", size:"", tag:"",
    tagline:"Move between floors in one jump.",
    description:"Place an Elevator block on every floor of your base and travel between them instantly.\n\nJump to go up, sneak to go down. No ladders, no water columns.",
    features:["Floors at any height","Works in multiplayer","Craftable in survival"],
@@ -357,7 +353,7 @@ const DEFAULTS = [
    features:["Extra inventory that follows you","Works with wolves, cats and horses","Items stay saved"],
    howTo:["Tame a pet","Use a chest on it","Interact with the pet to open its inventory"],
    gallery:[], video:"", changelog:["1.0: First release"]},
-  {name:"Bot", emoji:"🤖", color:"magenta", free:false, price:4.99, version:"1.0", mcVersion:"1.21+", size:"", tag:"New",
+  {name:"Bot", emoji:"🤖", color:"magenta", free:true, price:0, version:"1.0", mcVersion:"1.21+", size:"", tag:"New",
    tagline:"A helper that works for you.",
    description:"Spawn a bot that follows you, protects you and helps around your world.",
    features:["Simple commands","Follows and defends you","Customizable"],
@@ -369,7 +365,7 @@ const DEFAULTS = [
    features:["Named teleport points","Instant travel","Particle effects"],
    howTo:["Craft a Teleport pad","Place it and give it a name","Step on any pad and choose where to go"],
    gallery:[], video:"", changelog:["1.0: First release"]},
-  {name:"AutoMiner", emoji:"⛏️", color:"cyan", free:false, price:3.99, version:"1.0", mcVersion:"1.21+", size:"", tag:"",
+  {name:"AutoMiner", emoji:"⛏️", color:"cyan", free:true, price:0, version:"1.0", mcVersion:"1.21+", size:"", tag:"",
    tagline:"A machine that mines for you.",
    description:"Place the AutoMiner, give it fuel and let it dig. Every ore ends up in a chest.",
    features:["Mines a full area automatically","Collects drops into a chest","Stops when the chest is full"],
@@ -454,7 +450,7 @@ const colorVar = c => `var(--${c === "magenta" ? "mag" : c === "violet" ? "vio" 
 
 function renderList(){
   const free = addons.filter(isFree).length;
-  $("summary").textContent = addons.length ? `${addons.length} addon · ${free} gratis · ${addons.length - free} a pagamento · ${addons.filter(a => a.horror).length} horror · ${addons.filter(a => a.soon).length} in arrivo · ⬇ ${addons.reduce((n, a) => n + (+downloads[a.id] || 0), 0)} download` : "";
+  $("summary").textContent = addons.length ? `${addons.length} addon · ${addons.filter(a => a.premium).length} premium · ${addons.filter(a => a.horror).length} horror · ${addons.filter(a => a.soon).length} in arrivo · ⬇ ${addons.reduce((n, a) => n + (+downloads[a.id] || 0), 0)} download` : "";
   if (!addons.length){
     $("cards").innerHTML = `<div class="empty"><h2>Ancora nessun addon</h2><p>Puoi partire dai 5 addon già pronti (Elevator, PetChest, Bot, Teleport, AutoMiner) e poi modificarli.</p>
       <div class="row"><button class="btn green big" id="seed">Usa i 5 addon pronti</button><button class="btn big" id="add2">+ Crea da zero</button></div></div>`;
@@ -469,7 +465,7 @@ function renderList(){
         <div class="meta">${a.visible === false ? '<span class="tag off">Nascosto</span>' : ""}${a.horror ? '<span class="tag horror">🎃 Horror</span>' : ""}${a.soon ? '<span class="tag soon">⏳ Coming Soon</span>' : ""}${a.tag ? `<span class="tag">${esc(a.tag)}</span>` : ""}
           <span>❤ ${r.n ? `<b>${r.avg.toFixed(1)}</b> (${r.n} voti)` : "nessun voto"}</span>
           <span>📷 ${a.photos || 0} foto</span>${isFree(a) && a.download ? `<span>⬇ <b>${+downloads[a.id] || 0}</b> download</span>` : ""}</div></div>
-      <div class="price ${isFree(a) ? "free" : ""}">${isFree(a) ? "GRATIS" : cube + " " + num(a.price)}</div>
+      <div class="price ${a.premium ? "" : "free"}" style="${a.premium ? "color:#ffc83d" : ""}">${a.premium ? "★ PREMIUM" : "GRATIS"}</div>
       <div class="acts">
         <button class="btn sm green" type="button" data-edit="${a.id}">Modifica</button>
         <button class="iconbtn" type="button" data-move="-1" data-i="${i}" title="Sposta su" aria-label="Sposta su" ${i === 0 ? "disabled" : ""}>▲</button>
@@ -518,10 +514,9 @@ $("cancelBtn").addEventListener("click", leaveEditor);
 addEventListener("beforeunload", e => { if (dirty){ e.preventDefault(); e.returnValue = ""; } });
 
 function openEditor(a){
-  ed = {id: a?.id || null, icon: a?.icon || "", emoji: a?.emoji || "🧩", free: a ? isFree(a) : true, color: a?.color || "cyan", photos: [], photosLoaded: !a || !a.photos, photosChanged: false};
+  ed = {id: a?.id || null, icon: a?.icon || "", emoji: a?.emoji || "🧩", premium: !!a?.premium, color: a?.color || "cyan", photos: [], photosLoaded: !a || !a.photos, photosChanged: false};
   $("eTitle").textContent = a ? `Modifica ${a.name}` : "Nuovo addon";
   $("fName").value = a?.name || "";
-  $("fPrice").value = a && !isFree(a) ? String(a.price) : "";
   $("fTagline").value = a?.tagline || "";
   $("fDesc").value = a?.description || "";
   $("fVideo").value = a?.video || "";
@@ -567,12 +562,10 @@ $("iconFile").addEventListener("change", async e => {
 
 /* prezzo */
 function renderPrice(){
-  $("cFree").setAttribute("aria-pressed", ed.free); $("cPaid").setAttribute("aria-pressed", !ed.free);
-  $("priceWrap").hidden = ed.free;
-  $("dlWrap").hidden = !ed.free;
+  $("cFree").setAttribute("aria-pressed", !ed.premium); $("cPaid").setAttribute("aria-pressed", !!ed.premium);
 }
-$("cFree").addEventListener("click", () => { ed.free = true; dirty = true; renderPrice(); });
-$("cPaid").addEventListener("click", () => { ed.free = false; dirty = true; renderPrice(); setTimeout(() => $("fPrice").focus(), 50); });
+$("cFree").addEventListener("click", () => { ed.premium = false; dirty = true; renderPrice(); });
+$("cPaid").addEventListener("click", () => { ed.premium = true; dirty = true; renderPrice(); });
 
 /* colore */
 function renderColors(){ document.querySelectorAll("#colors button").forEach(b => b.setAttribute("aria-pressed", b.dataset.c === ed.color)); }
@@ -646,19 +639,17 @@ async function toPhoto(file){
 $("saveBtn").addEventListener("click", async () => {
   $("eErr").textContent = "";
   const name = val("fName");
-  const price = Math.round(parseFloat(val("fPrice").replace(",", ".")) * 100) / 100;
   if (!name){ $("eErr").textContent = "Scrivi il nome dell'addon (punto 1)."; $("fName").focus(); return; }
-  if (!ed.free && !(price > 0)){ $("eErr").textContent = "Scrivi quanti cubi costa (punto 2)."; $("fPrice").focus(); return; }
   const dl = val("fDl");
-  if (ed.free && dl && !/^https:\/\/\S+$/i.test(dl)){ $("eErr").textContent = "Il link download deve iniziare con https:// (punto 2)."; $("fDl").focus(); return; }
+  if (dl && !/^https:\/\/\S+$/i.test(dl)){ $("eErr").textContent = "Il link download deve iniziare con https:// (punto 2)."; $("fDl").focus(); return; }
   if (!ed.photosLoaded){ $("eErr").textContent = "Aspetta che le foto finiscano di caricare."; return; }
   const data = {
     name, emoji: ed.emoji, icon: ed.icon, image: null,
-    free: ed.free, price: ed.free ? 0 : price,
+    free: true, price: 0, premium: !!ed.premium,
     tagline: val("fTagline"), description: $("fDesc").value.trim(), video: val("fVideo"),
     features: lines($("fFeat").value), howTo: lines($("fHow").value), changelog: lines($("fLog").value),
     version: val("fVer"), mcVersion: val("fMc"), size: val("fSize"), tag: val("fTag"),
-    color: ed.color, visible: $("fVisible").checked, horror: $("fHorror").checked, soon: $("fSoon").checked, soonDate: $("fSoonDate").value.trim() || null, progress: $("fSoon").checked ? (Math.min(95, Math.max(5, parseInt($("fProg").value) || 60))) : null, download: ed.free && dl ? dl : null, photos: ed.photos.length, gallery: null, updatedAt: Date.now()
+    color: ed.color, visible: $("fVisible").checked, horror: $("fHorror").checked, soon: $("fSoon").checked, soonDate: $("fSoonDate").value.trim() || null, progress: $("fSoon").checked ? (Math.min(95, Math.max(5, parseInt($("fProg").value) || 60))) : null, download: dl || null, photos: ed.photos.length, gallery: null, updatedAt: Date.now()
   };
   const id = ed.id || push(ref(db, A)).key;
   if (!ed.id) data.order = addons.length ? Math.max(...addons.map(a => a.order ?? 0)) + 1 : 0;
