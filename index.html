@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>MCPE Addons – Free &amp; Premium Minecraft PE / Bedrock Add-ons | CraftGlitch</title>
-<meta name="description" content="Download MCPE addons for Minecraft Bedrock &amp; Pocket Edition: Elevator, PetChest, Bot, Teleport, AutoMiner and more. Free and premium .mcaddon packs for mobile, Windows, Xbox and Realms.">
+<meta name="description" content="Download MCPE addons for Minecraft Bedrock &amp; Pocket Edition: Elevator, PetChest, Bot, Teleport, AutoMiner and more. Free .mcaddon packs, plus premium add-ons with extra modes, for mobile, Windows, Xbox and Realms.">
 <meta name="keywords" content="mcpe addons, mcpe addon, minecraft pe addons, minecraft bedrock addons, addon mcpe, addon minecraft pe, mcaddon, minecraft add-ons, bedrock add-ons, free mcpe addons, elevator addon, autominer addon, teleport addon, horror addon mcpe, minecraft horror addons">
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
 <link rel="canonical" href="https://glitchcraft-xi.vercel.app/">
@@ -30,8 +30,9 @@
   {"@type":"Organization","@id":"https://glitchcraft-xi.vercel.app/#org","name":"CraftGlitch","url":"https://glitchcraft-xi.vercel.app/","logo":"https://glitchcraft-xi.vercel.app/logo.png","email":"glitchcraft666yt@gmail.com"},
   {"@type":"FAQPage","mainEntity":[
     {"@type":"Question","name":"How fast do you reply?","acceptedAnswer":{"@type":"Answer","text":"Usually within 24 hours. Check your spam folder if you don't see our reply."}},
-    {"@type":"Question","name":"How do I pay for a premium add-on?","acceptedAnswer":{"@type":"Answer","text":"By bank transfer. After your email we send you our IBAN; as soon as the payment arrives you get the download link."}},
-    {"@type":"Question","name":"Are free add-ons really free?","acceptedAnswer":{"@type":"Answer","text":"Yes, nothing to pay. Many free add-ons have a Download button that gets you the file straight away; for the others, send the email and you get the link."}},
+    {"@type":"Question","name":"What does Premium mean?","acceptedAnswer":{"@type":"Answer","text":"Premium add-ons are still free to download. The label is for the big ones, with extra game modes and more features."}},
+    
+    {"@type":"Question","name":"Are the add-ons really free?","acceptedAnswer":{"@type":"Answer","text":"Yes, every add-on is free. Many have a Download button that gets you the file straight away; for the others, send the email and you get the link."}},
     {"@type":"Question","name":"Do these addons work on Minecraft PE (MCPE)?","acceptedAnswer":{"@type":"Answer","text":"Yes. All CraftGlitch add-ons are made for Minecraft Bedrock Edition, which includes Minecraft PE on Android and iOS, Windows, Xbox, PlayStation, Switch and Realms."}},
     {"@type":"Question","name":"How do I install an MCPE addon?","acceptedAnswer":{"@type":"Answer","text":"Open the .mcaddon or .mcpack file: Minecraft imports it automatically. Then edit your world, enable the behavior and resource packs and turn on any experimental toggles the add-on needs."}}
   ]}
@@ -296,6 +297,57 @@ h2{font:700 clamp(32px,4.4vw,48px)/1.05 var(--px);margin:0 0 10px;text-shadow:3p
 @media(max-width:780px){.yt-card{grid-template-columns:1fr;text-align:center;justify-items:center;padding:28px 22px}}
 .nav-yt{color:#ff6b75!important}
 
+/* ---------- premium / tabs ---------- */
+.tabs{flex-wrap:wrap}
+.tabs button{margin-top:-3px}
+.addon.premium{--accent:#ffc83d;box-shadow:inset 3px 3px 0 #6b5316,inset -3px -3px 0 #0b0717,0 0 26px rgba(255,200,61,.22)}
+.addon.premium::before{background:linear-gradient(90deg,#ffc83d,#fff3a6,#ffc83d);background-size:200% 100%;animation:gold 3s linear infinite}
+@keyframes gold{to{background-position:-200% 0}}
+.addon.premium .ribbon{background:#ffc83d;color:#3a2500}
+.addon.premium .price.free{color:#ffc83d}
+.mc-btn.gold{--b:#d99a1a;--bd:#7a5008}
+.soon .ribbon{z-index:2}
+
+/* ---------- YouTube button animations ---------- */
+.yt-btn{position:relative;overflow:hidden;animation:ytglow 2.2s ease-in-out infinite}
+.yt-btn::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:35%;background:linear-gradient(105deg,transparent,rgba(255,255,255,.6),transparent);transform:skewX(-20deg);animation:shine 2.8s ease-in-out infinite;pointer-events:none}
+@keyframes shine{0%,55%{left:-60%}100%{left:135%}}
+@keyframes ytglow{50%{box-shadow:inset 0 -5px 0 var(--bd),inset 0 2px 0 rgba(255,255,255,.3),0 0 22px 4px rgba(255,31,46,.65)}}
+.yt-btn:hover{transform:translateY(-3px) scale(1.05) rotate(-1deg)}
+.yt-btn .ico{display:inline-block;animation:nudge 1.1s ease-in-out infinite}
+@keyframes nudge{50%{transform:translateX(5px)}}
+.bell{display:inline-block;transform-origin:50% 0;animation:ring 2.6s ease-in-out infinite}
+@keyframes ring{0%,55%,100%{rotate:0deg}60%{rotate:20deg}65%{rotate:-18deg}70%{rotate:14deg}75%{rotate:-10deg}80%{rotate:5deg}}
+.nav-yt::before{content:"●";color:#ff1f2e;margin-right:6px;animation:blink 1s steps(1) infinite}
+.top nav a.nav-yt:hover{color:#ff6b75}
+.nav-sup{color:#ffc83d!important}
+.fps{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.fp{position:absolute;bottom:-30px;font-style:normal;color:rgba(255,31,46,.35);font-size:18px;animation:rise 6s linear infinite}
+.fp:nth-child(1){left:12%;animation-delay:0s}.fp:nth-child(2){left:30%;animation-delay:1.4s;font-size:12px}
+.fp:nth-child(3){left:52%;animation-delay:2.8s}.fp:nth-child(4){left:74%;animation-delay:.8s;font-size:14px}.fp:nth-child(5){left:90%;animation-delay:3.6s}
+@keyframes rise{to{transform:translateY(-260px) rotate(20deg);opacity:0}}
+.yt-card:hover .yt-play{animation-duration:.8s}
+
+/* ---------- support ---------- */
+.sup-card{display:grid;grid-template-columns:auto 1fr;gap:30px;align-items:center;padding:32px 36px;position:relative;overflow:hidden;
+  background:linear-gradient(120deg,#2d1c08,#1d1733 70%);border:3px solid #000;box-shadow:inset 3px 3px 0 #6b5316,inset -3px -3px 0 #0b0717}
+.sup-card::before{content:"";position:absolute;left:3px;right:3px;top:3px;height:5px;background:#ffc83d}
+.cup{position:relative;font-size:96px;line-height:1;animation:float 5s ease-in-out infinite;filter:drop-shadow(0 0 18px rgba(255,200,61,.4))}
+.cup i{position:absolute;top:-6px;width:8px;height:8px;background:rgba(255,255,255,.6);animation:steam 2.4s ease-in infinite}
+.cup i:nth-child(1){left:26px}.cup i:nth-child(2){left:46px;animation-delay:.8s}.cup i:nth-child(3){left:66px;animation-delay:1.6s}
+@keyframes steam{0%{transform:translateY(0);opacity:.8}100%{transform:translateY(-34px) translateX(6px);opacity:0}}
+.sup-copy .kick{display:inline-block;font:600 14px var(--body);letter-spacing:.2em;text-transform:uppercase;color:#ffc83d;margin-bottom:6px}
+.sup-copy h2{margin:0 0 8px;font-size:clamp(28px,4vw,42px)}
+.sup-copy p{margin:0 0 16px;color:var(--muted);max-width:38em}
+.iban-box{background:#0f0a1f;border:3px solid #000;box-shadow:inset 3px 3px 0 #000,inset -3px -3px 0 #3a2f60;padding:14px 16px;margin-bottom:16px;max-width:520px}
+.iban-lbl{display:block;font:600 13px var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.iban-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.iban-row code{font:700 clamp(18px,3.6vw,26px) var(--px);color:#ffc83d;letter-spacing:.04em;user-select:all;-webkit-user-select:all}
+.sup-copy .sup-help{font-size:15px;margin-bottom:12px}
+.cup-s{font-size:26px;flex:none}
+@media(max-width:700px){.sup-card{grid-template-columns:1fr;text-align:center;justify-items:center;padding:28px 20px}.iban-row{justify-content:center}}
+@media (prefers-reduced-motion:reduce){.yt-btn,.yt-btn::after,.yt-btn .ico,.bell,.yt-play,.fp,.cup,.cup i,.nav-yt::before,.addon.premium::before{animation:none}}
+
 /* steps */
 .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;padding:0;margin:0}
 .steps li{list-style:none;padding:26px}
@@ -414,10 +466,11 @@ dialog::backdrop{background:rgba(0,0,0,.72);backdrop-filter:blur(4px)}
   <div class="wrap">
     <a class="brand" href="./"><img src="favicon.png" alt="CraftGlitch MCPE addons" width="32" height="32">CraftGlitch</a>
     <nav aria-label="Main">
+      <a href="#soon" id="navSoon" hidden>Coming Soon</a>
       <a href="#addons">Add-ons</a>
       <a href="#horror" id="navHorror" hidden>Horror</a>
-      <a href="#soon" id="navSoon" hidden>Coming Soon</a>
       <a href="https://youtube.com/@craftglitch666?si=TNXG_9ueAc4gD1ki" class="nav-yt" target="_blank" rel="noopener">YouTube</a>
+      <a href="#support" class="nav-sup">☕ Support</a>
       <a href="#how">How it works</a>
       <a href="#faq">FAQ</a>
     </nav>
@@ -433,7 +486,7 @@ dialog::backdrop{background:rgba(0,0,0,.72);backdrop-filter:blur(4px)}
         <p class="lead">Elevators, pet chests, bots, teleporters and auto-miners for your Minecraft PE / Bedrock world. Pick an add-on, send us an email and it lands in your inbox.</p>
         <div class="ctas">
           <a class="mc-btn green" href="#addons">Browse add-ons</a>
-          <a class="mc-btn yt-btn" href="https://youtube.com/@craftglitch666?si=TNXG_9ueAc4gD1ki" target="_blank" rel="noopener">▶ Watch on YouTube</a>
+          <a class="mc-btn yt-btn" href="https://youtube.com/@craftglitch666?si=TNXG_9ueAc4gD1ki" target="_blank" rel="noopener"><span class="ico">▶</span> Watch on YouTube</a>
           <a class="mc-btn" href="#how">How it works</a>
         </div>
       </div>
@@ -447,18 +500,24 @@ dialog::backdrop{background:rgba(0,0,0,.72);backdrop-filter:blur(4px)}
     <div class="ground" aria-hidden="true"></div>
   </section>
 
+  <section class="soon" id="soon" hidden>
+    <div class="scan" aria-hidden="true"></div>
+    <div class="wrap">
+      <span class="kick">Loading new content</span>
+      <h2>Coming Soon<span class="blink" aria-hidden="true"></span></h2>
+      <p class="sub">The next MCPE add-ons are being built right now. Watch the progress bars and follow the channel to see them first.</p>
+      <div class="grid" id="sgrid"></div>
+    </div>
+  </section>
+
   <section class="block" id="addons">
     <div class="wrap">
       <div class="bar">
         <div>
           <div class="h2wrap"><h2>MCPE Add-ons</h2><span class="mini-splash" aria-hidden="true" data-set="addons"><span class="pop"><span class="txt"></span></span></span></div>
-          <p class="sub">Some are free, some cost a few cubes. Tap any add-on to see everything it does.</p>
+          <p class="sub">All add-ons are free. ★ Premium ones are the big ones, packed with extra modes. Tap any add-on to see everything it does.</p>
         </div>
-        <div class="tabs" role="group" aria-label="Filter add-ons">
-          <button type="button" data-f="all" aria-pressed="true">All</button>
-          <button type="button" data-f="free" aria-pressed="false">Free</button>
-          <button type="button" data-f="paid" aria-pressed="false">Premium</button>
-        </div>
+        <div class="tabs" id="tabs" role="group" aria-label="Filter add-ons" hidden></div>
       </div>
       <div class="grid" id="grid" aria-live="polite">
         <div class="skel"></div><div class="skel"></div><div class="skel"></div>
@@ -478,26 +537,36 @@ dialog::backdrop{background:rgba(0,0,0,.72);backdrop-filter:blur(4px)}
     </div>
   </section>
 
-  <section class="soon" id="soon" hidden>
-    <div class="scan" aria-hidden="true"></div>
-    <div class="wrap">
-      <span class="kick">Loading new content</span>
-      <h2>Coming Soon<span class="blink" aria-hidden="true"></span></h2>
-      <p class="sub">The next MCPE add-ons are being built right now. Watch the progress bars and follow the channel to see them first.</p>
-      <div class="grid" id="sgrid"></div>
-    </div>
-  </section>
-
   <section class="yt" id="youtube">
     <div class="wrap">
       <div class="yt-card">
+        <div class="fps" aria-hidden="true"><i class="fp">▶</i><i class="fp">▶</i><i class="fp">▶</i><i class="fp">▶</i><i class="fp">▶</i></div>
         <div class="yt-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
         <div class="yt-copy">
           <span class="kick">Main channel</span>
           <h2>Watch us on YouTube</h2>
           <p>Every add-on, showcase and MCPE trick lands first on the channel. <span class="handle">@craftglitch666</span> — subscribe so you don't miss the next drop.</p>
         </div>
-        <a class="mc-btn yt-btn" href="https://youtube.com/@craftglitch666?si=TNXG_9ueAc4gD1ki" target="_blank" rel="noopener">▶ Subscribe</a>
+        <a class="mc-btn yt-btn" href="https://youtube.com/@craftglitch666?si=TNXG_9ueAc4gD1ki" target="_blank" rel="noopener"><span class="bell">🔔</span> Subscribe</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="block support" id="support">
+    <div class="wrap">
+      <div class="sup-card">
+        <div class="cup" aria-hidden="true">☕<i></i><i></i><i></i></div>
+        <div class="sup-copy">
+          <span class="kick">Support the work</span>
+          <h2>Buy me a coffee</h2>
+          <p>Every add-on is free and always will be. If you like them and want to help me build the next ones, even the price of a coffee means a lot. Thank you!</p>
+          <div class="iban-box">
+            <span class="iban-lbl">Bank transfer · IBAN</span>
+            <div class="iban-row"><code id="ibanTxt">BE36 9059 4964 7181</code><button class="mc-btn sm gold" type="button" id="ibanCopy">Copy IBAN</button></div>
+          </div>
+          <p class="sup-help">Problems with the payment? Send me an email and I'll sort it out.</p>
+          <a class="mc-btn sm" id="supMail" href="mailto:glitchcraft666yt@gmail.com?subject=%5BCraftGlitch%5D%20Support%20%2F%20payment&body=Hi!%0A%0AI%20wanted%20to%20support%20CraftGlitch.%0A%0AName%20%2F%20Gamertag%3A%20%0AProblem%20(if%20any)%3A%20%0A">✉ Email me</a>
+        </div>
       </div>
     </div>
   </section>
@@ -507,11 +576,11 @@ dialog::backdrop{background:rgba(0,0,0,.72);backdrop-filter:blur(4px)}
       <div class="h2wrap"><h2>How it works</h2><span class="mini-splash" aria-hidden="true" data-set="how"><span class="pop"><span class="txt"></span></span></span></div>
       <p class="sub">No account, no checkout. Three steps and the add-on is yours.</p>
       <ol class="steps">
-        <li class="mc-panel"><b>1</b><h3>Pick an add-on</h3><p>Open it, read what it does, then press Request.</p></li>
+        <li class="mc-panel"><b>1</b><h3>Pick an add-on</h3><p>Open it, read what it does, then press Get it.</p></li>
         <li class="mc-panel"><b>2</b><h3>Send the email</h3><p>A ready-made email opens. Add your gamertag and send it.</p></li>
-        <li class="mc-panel"><b>3</b><h3>Get your link</h3><p>Free add-ons with a Download button skip this: you get the file right away. Other free add-ons: you get the download link. Premium: you get our IBAN first, then the link once the transfer arrives.</p></li>
+        <li class="mc-panel"><b>3</b><h3>Get your link</h3><p>Add-ons with a Download button skip this: you get the file right away. For the others, we reply with the download link within 24 hours.</p></li>
       </ol>
-      <div class="note mc-panel"><svg class="cube"><use href="#cube"/></svg><span>Prices are in cubes. One cube equals €1, paid by bank transfer.</span></div>
+      <div class="note mc-panel"><span class="cup-s" aria-hidden="true">☕</span><span>Everything here is free. Want to help me make more? <a href="#support" style="color:var(--splash)">Support the work</a>.</span></div>
     </div>
   </section>
 
@@ -521,8 +590,9 @@ dialog::backdrop{background:rgba(0,0,0,.72);backdrop-filter:blur(4px)}
       <p class="sub">What players ask us most.</p>
       <div class="faq">
         <details class="mc-panel"><summary>How fast do you reply?</summary><p>Usually within 24 hours. Check your spam folder if you don't see our reply.</p></details>
-        <details class="mc-panel"><summary>How do I pay for a premium add-on?</summary><p>By bank transfer. After your email we send you our IBAN; as soon as the payment arrives you get the download link.</p></details>
-        <details class="mc-panel"><summary>Are free add-ons really free?</summary><p>Yes, nothing to pay. Many free add-ons have a Download button that gets you the file straight away; for the others, send the email and you get the link.</p></details>
+        <details class="mc-panel"><summary>What does Premium mean?</summary><p>Premium add-ons are still free to download. The label is for the big ones: extra game modes and more features than a standard add-on.</p></details>
+        <details class="mc-panel"><summary>How can I support you?</summary><p>Add-ons are free, but a coffee always helps. Use the bank transfer details in the Support section, and email us if you have any problem with the payment.</p></details>
+        <details class="mc-panel"><summary>Are the add-ons really free?</summary><p>Yes, every add-on is free. Many have a Download button that gets you the file straight away; for the others, send the email and you get the link.</p></details>
         <details class="mc-panel"><summary>How do I rate an add-on?</summary><p>Request it first. Then open the add-on again and tap the hearts. Each player can rate each add-on once.</p></details>
         <details class="mc-panel"><summary>Do these addons work on Minecraft PE (MCPE)?</summary><p>Yes. All CraftGlitch add-ons are made for Minecraft Bedrock Edition, which includes Minecraft PE on Android and iOS, Windows, Xbox, PlayStation, Switch and Realms.</p></details>
         <details class="mc-panel"><summary>How do I install an MCPE addon?</summary><p>Open the .mcaddon or .mcpack file: Minecraft imports it automatically. Then edit your world, enable the behavior and resource packs and turn on any experimental toggles the add-on needs.</p></details>
@@ -618,13 +688,12 @@ let addons = [], ratings = {}, filter = "all", current = null, tab = "overview",
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const safeUrl = u => { u = String(u || "").trim(); return /^(https?:\/\/|\.?\/?[\w-]+\/)/i.test(u) || /^[\w-]+\.(png|jpe?g|gif|webp)$/i.test(u) ? u : ""; };
 const lines = v => Array.isArray(v) ? v.filter(Boolean) : String(v || "").split("\n").map(s => s.trim()).filter(Boolean);
-const isFree = a => a.free || !Number(a.price);
+const isFree = a => true; /* tutti gli addon sono gratis */
+const isPremium = a => !!a.premium;
 const dlLink = a => isFree(a) && /^https:\/\/\S+$/i.test(String(a.download || "").trim()) ? String(a.download).trim() : "";
 const num = n => Number(n).toLocaleString("en-US", {minimumFractionDigits: Number(n) % 1 ? 2 : 0, maximumFractionDigits: 2});
 const cube = '<svg class="cube" aria-hidden="true"><use href="#cube"/></svg>';
-const priceHTML = (a, note = true) => isFree(a)
-  ? `<div><div class="price free">Free</div>${note ? `<small style='display:block;font-size:12px;color:var(--muted);margin-top:4px'>${dlLink(a) ? "Direct download" : "Link by email"}</small>` : ""}</div>`
-  : `<div><div class="price" aria-label="${num(a.price)} cubes">${cube}${num(a.price)}</div>${note ? "<small style='display:block;font-size:12px;color:var(--muted);margin-top:4px'>Bank transfer</small>" : ""}</div>`;
+const priceHTML = (a, note = true) => `<div><div class="price free">Free</div>${note ? `<small style='display:block;font-size:12px;color:var(--muted);margin-top:4px'>${isPremium(a) && !a.horror ? "★ Premium · extra modes" : dlLink(a) ? "Direct download" : "Link by email"}</small>` : ""}</div>`;
 const dataImg = u => /^data:image\/(png|jpe?g|webp);base64,[A-Za-z0-9+/=]+$/.test(String(u || "")) ? u : "";
 const imgSrc = u => dataImg(u) || safeUrl(u);
 const iconHTML = a => imgSrc(a.icon || a.image) ? `<img src="${esc(imgSrc(a.icon || a.image))}" alt="">` : esc(a.emoji || "🧩");
@@ -719,8 +788,8 @@ function soonCardHTML(a){
 function cardHTML(a){
   const free = isFree(a), h = isHorror(a);
   const cov = imgSrc(a.icon || a.image);
-  return `<article class="addon mc-panel" data-color="${esc(a.color || "cyan")}" data-open="${esc(a.id)}">
-      ${a.tag ? `<span class="ribbon">${esc(a.tag)}</span>` : ""}
+  return `<article class="addon mc-panel${isPremium(a) && !h ? " premium" : ""}" data-color="${esc(a.color || "cyan")}" data-open="${esc(a.id)}">
+      ${isPremium(a) && !h ? `<span class="ribbon">★ PREMIUM</span>` : a.tag ? `<span class="ribbon">${esc(a.tag)}</span>` : ""}
       ${cov ? `<div class="cover"><img src="${esc(cov)}" alt="${esc(a.name)} MCPE add-on" loading="lazy"></div>` : ""}
       <div class="head">${cov ? "" : `<div class="slot">${iconHTML(a)}</div>`}
         <div><h3>${esc(a.name)}</h3>${ratingLine(a.id)}</div></div>
@@ -730,34 +799,47 @@ function cardHTML(a){
         <div class="acts">
           <button class="mc-btn sm" type="button" data-open="${esc(a.id)}">Details</button>
           ${dlLink(a)
-            ? `<a class="mc-btn sm ${h ? "blood" : "green"}" href="${esc(dlLink(a))}" target="_blank" rel="noopener" data-dl="${esc(a.id)}">⬇ Download</a>`
+            ? `<a class="mc-btn sm ${h ? "blood" : isPremium(a) ? "gold" : "green"}" href="${esc(dlLink(a))}" target="_blank" rel="noopener" data-dl="${esc(a.id)}">⬇ Download</a>`
             : blockedUntil(a.id)
             ? `<button class="mc-btn sm done" type="button" data-req="${esc(a.id)}">Requested ✓</button>`
-            : `<button class="mc-btn sm ${h ? "blood" : free ? "green" : "amethyst"}" type="button" data-req="${esc(a.id)}">${free ? "Get it" : "Request"}</button>`}
+            : `<button class="mc-btn sm ${h ? "blood" : isPremium(a) ? "gold" : "green"}" type="button" data-req="${esc(a.id)}">Get it</button>`}
         </div>
       </div>
     </article>`;
 }
+const isStd = a => !isSoon(a) && !isHorror(a) && !isPremium(a);
+const isPrem = a => !isSoon(a) && !isHorror(a) && isPremium(a);
+const CATS = [["all", "All", () => true], ["std", "Standard", isStd], ["prem", "★ Premium", isPrem], ["horror", "🎃 Horror", isHorror], ["soon", "⏳ Coming Soon", isSoon]];
 function render(){
   if (addons.length) seoData();
-  const soon = addons.filter(isSoon);
-  $("soon").hidden = $("navSoon").hidden = !soon.length;
+  const soon = addons.filter(isSoon), scary = addons.filter(isHorror);
+  const cats = CATS.filter(([k,, fn]) => k === "all" || addons.some(fn));
+  if (!cats.some(c => c[0] === filter)) filter = "all";
+  const tabsEl = $("tabs");
+  tabsEl.hidden = cats.length < 3;
+  tabsEl.innerHTML = cats.map(([k, label]) => `<button type="button" data-f="${k}" aria-pressed="${k === filter}">${label}</button>`).join("");
+  const all = filter === "all";
+  $("navSoon").hidden = !soon.length; $("navHorror").hidden = !scary.length;
+  $("soon").hidden = !soon.length || !all;
+  $("horror").hidden = !scary.length || !all;
   sgrid.innerHTML = soon.map(soonCardHTML).join("");
-  const scary = addons.filter(isHorror);
-  $("horror").hidden = $("navHorror").hidden = !scary.length;
   hgrid.innerHTML = scary.map(cardHTML).join("");
-  const list = addons.filter(a => !isHorror(a) && !isSoon(a) && (filter === "all" || (filter === "free" ? isFree(a) : !isFree(a))));
+  const list = all ? addons.filter(a => !isHorror(a) && !isSoon(a)) : addons.filter(CATS.find(c => c[0] === filter)[2]);
   if (!list.length){
-    grid.innerHTML = `<div class="empty mc-panel"><strong>${addons.length ? "Nothing here." : "No add-ons yet."}</strong>${addons.length ? "Try another filter." : "New add-ons are on the way. Check back soon."}</div>`;
+    grid.innerHTML = `<div class="empty mc-panel"><strong>${addons.length ? (all ? "More add-ons are on the way." : "Nothing here.") : "No add-ons yet."}</strong>${addons.length ? (all ? "Check the sections below." : "Try another filter.") : "New add-ons are on the way. Check back soon."}</div>`;
     return;
   }
-  grid.innerHTML = list.map(cardHTML).join("");
+  grid.innerHTML = list.map(a => isSoon(a) ? soonCardHTML(a) : cardHTML(a)).join("");
 }
-document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", () => {
-  filter = b.dataset.f;
-  document.querySelectorAll(".tabs button").forEach(x => x.setAttribute("aria-pressed", x === b));
-  render();
-}));
+$("tabs").addEventListener("click", e => {
+  const b = e.target.closest("[data-f]"); if (!b) return;
+  filter = b.dataset.f; render();
+});
+document.querySelectorAll('nav a[href="#soon"], nav a[href="#horror"]').forEach(a => a.addEventListener("click", () => { if (filter !== "all"){ filter = "all"; render(); } }));
+$("ibanCopy").addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText("BE36905949647181"); toast("IBAN copied! Thank you ☕"); }
+  catch { const r = document.createRange(); r.selectNodeContents($("ibanTxt")); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); toast("Press copy on the selected IBAN."); }
+});
 [grid, hgrid].forEach(g => g.addEventListener("click", e => {
   const d = e.target.closest("[data-dl]");
   if (d) { e.stopPropagation(); return markDl(d.dataset.dl); }
@@ -784,7 +866,7 @@ function openDetail(a){
     a.version && ["Version", a.version],
     a.mcVersion && ["Minecraft", a.mcVersion],
     a.size && ["Size", a.size],
-    ["Type", isFree(a) ? "Free" : "Premium"]
+    ["Type", isPremium(a) ? "★ Premium (free)" : "Free"]
   ].filter(Boolean);
   $("dChips").innerHTML = chips.map(([k, v]) => `<span class="chip">${k} <b>${esc(v)}</b></span>`).join("");
   $("dPrice").innerHTML = priceHTML(a);
@@ -843,10 +925,10 @@ $("dReq").addEventListener("click", () => {
   markDl(current.id);
 });
 function setReqBtn(a){
-  if (dlLink(a)){ $("dReq").textContent = "⬇ Download"; $("dReq").className = "mc-btn " + (isHorror(a) ? "blood" : "green"); return; }
-  const free = isFree(a), done = blockedUntil(a.id);
-  $("dReq").textContent = done ? "Requested ✓" : free ? "Get it free" : "Request";
-  $("dReq").className = "mc-btn " + (done ? "done" : free ? "green" : "amethyst");
+  if (dlLink(a)){ $("dReq").textContent = "⬇ Download"; $("dReq").className = "mc-btn " + (isHorror(a) ? "blood" : isPremium(a) ? "gold" : "green"); return; }
+  const done = blockedUntil(a.id);
+  $("dReq").textContent = done ? "Requested ✓" : "Get it free";
+  $("dReq").className = "mc-btn " + (done ? "done" : isPremium(a) && !isHorror(a) ? "gold" : "green");
 }
 
 /* ---------- rating ---------- */
@@ -899,28 +981,19 @@ function openRequest(a){
   if (!a) return;
   const free = isFree(a);
   const subject = `[CraftGlitch] Add-on request: ${a.name}`;
-  const body = free
-    ? `Hi!\n\nI'd like to get the free add-on "${a.name}".\n\nName / Gamertag: \n\nThanks!`
-    : `Hi!\n\nI'd like to buy the add-on "${a.name}" (${num(a.price)} cubes = €${num(a.price)}).\nPlease send me the IBAN for the bank transfer.\n\nName / Gamertag: \n\nThanks!`;
+  const body = `Hi!\n\nI'd like to get the free add-on "${a.name}".\n\nName / Gamertag: \n\nThanks!`;
   mailText = `To: ${MAIL}\nSubject: ${subject}\n\n${body}`;
   $("rIcon").innerHTML = iconHTML(a);
   $("rName").textContent = a.name;
   $("rPrice").innerHTML = priceHTML(a, false);
-  $("rSteps").innerHTML = free
-    ? "<li>Send the ready-made email.</li><li>Get the download link in your inbox.</li><li>Come back and rate it.</li>"
-    : `<li>Send the ready-made email.</li><li>Get our IBAN and send €${num(a.price)} by bank transfer.</li><li>Get the download link once the payment arrives.</li>`;
+  $("rSteps").innerHTML = "<li>Send the ready-made email.</li><li>Get the download link in your inbox.</li><li>Come back and rate it.</li>";
   const send = $("rSend");
   send.href = `mailto:${MAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  send.className = "mc-btn full " + (free ? "green" : "amethyst");
+  send.className = "mc-btn full " + (isPremium(a) && !isHorror(a) ? "gold" : "green");
   send.dataset.id = a.id;
   const until = blockedUntil(a.id);
   if (until) showDone(a, false);
   else if (recentCount() >= BURST) showWait();
-  else if (!free){
-    $("rConfirmText").innerHTML = `${esc(a.name)} costs <b>${num(a.price)} cubes</b>, which means <b>€${num(a.price)}</b> paid by bank transfer. ` +
-      `After your email we'll send you our IBAN, and the download link once the payment arrives. Do you want to continue?`;
-    view("rConfirm");
-  }
   else view("rOpen");
   $("req").showModal();
 }
@@ -932,7 +1005,7 @@ function showDone(a, justSent){
   $("rDone").querySelector(".r-done").classList.remove("wait");
   $("rDoneTitle").textContent = justSent ? "Request sent!" : "Already requested";
   $("rDoneText").textContent = (justSent ? "" : `You requested ${a.name} on ${fmtDate(t)}. `) +
-    `We'll reply to your email within 24 hours with ${free ? "the download link" : "our IBAN"}. Check your spam folder too. ` +
+    `We'll reply to your email within 24 hours with the download link. Check your spam folder too. ` +
     `No reply? You can ask again from ${fmtDate(t + COOLDOWN)}.`;
 }
 function showWait(){
@@ -987,12 +1060,12 @@ $("yr").textContent = new Date().getFullYear();
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const SPLASH = [
   "Now with 100% more glitch!", "Made for Bedrock!", "Enderman approved!", "Also try AutoMiner!", "Redstone not required!",
-  "Pixel perfect!", "Creeper-proof!", "Free cubes? Some!", "Glitch in the matrix!", "Crafted at 3 AM!",
+  "Pixel perfect!", "Creeper-proof!", "Free add-ons? Yes!", "Glitch in the matrix!", "Crafted at 3 AM!",
   "Contains 0% bugs*", "*Some bugs included", "Now in purple!", "Diamonds not included!", "Tap me!",
   "Ender pearls sold separately!", "Built block by block!", "Runs on pure redstone!", "Smells like dirt!", "As seen in the Nether!",
   "Hostile mobs hate this!", "Mined with love!", "Ctrl+Z won't save you!", "One more block!", "Totally not a glitch!",
   "Respawn ready!", "Night vision recommended!", "Bring your own pickaxe!", "Elevator going up!", "Pets love chests!",
-  "Teleport responsibly!", "Bots need love too!", "Infinite cubes? Nope!", "Sleep skips the night!", "Craft. Glitch. Repeat.",
+  "Teleport responsibly!", "Bots need love too!", "Always free. Always glitchy!", "Sleep skips the night!", "Craft. Glitch. Repeat.",
   "404: creeper not found", "Loading chunks…", "Better than gravel!", "Now 16× more pixelated!", "Don't dig straight down!",
   "Warden-approved silence!", "Ender dragon tested!", "Waterlogged!", "Fully stackable!", "Max level hype!",
   "Spawn chunk certified!", "XP bar filling up!", "Made in Italy!", "Moo-ving fast!", "Glitch mode: ON"
