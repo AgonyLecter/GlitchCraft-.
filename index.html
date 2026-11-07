@@ -397,6 +397,7 @@ h2{font:700 clamp(32px,4.4vw,48px)/1.05 var(--px);margin:0 0 10px;text-shadow:3p
 @media (prefers-reduced-motion:reduce){.vid .pbtn{animation:none}}
 
 /* video mp4 */
+.vid .vload{position:absolute;left:50%;top:50%;translate:-50% -50%;z-index:2;font:700 15px var(--px);letter-spacing:.1em;color:var(--cyan);background:rgba(3,10,20,.85);border:2px solid #000;padding:8px 12px;text-shadow:0 0 10px var(--cyan);white-space:nowrap;animation:pulse 1.4s ease-in-out infinite}
 .vid video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000;display:block;cursor:pointer}
 .vid::after{content:"";position:absolute;left:0;right:0;bottom:0;height:40%;background:linear-gradient(transparent,rgba(0,0,0,.82));pointer-events:none;z-index:1}
 .vid .cap{right:104px;padding:10px 12px 12px;z-index:2}
@@ -809,19 +810,51 @@ const recentCount = () => { try { return JSON.parse(store.get("cg_req_log") || "
 const logReq = () => { let l = []; try { l = JSON.parse(store.get("cg_req_log") || "[]"); } catch {} l = l.filter(t => Date.now() - t < BURST_WIN); l.push(Date.now()); store.set("cg_req_log", JSON.stringify(l)); };
 const fmtDate = t => new Date(t).toLocaleDateString("en-GB", {day: "numeric", month: "long"}) + " at " + new Date(t).toLocaleTimeString("en-GB", {hour: "2-digit", minute: "2-digit"});
 
-/* ---------- video reel (MP4: parte da solo, muto; l'utente puo' pausare o attivare l'audio) ---------- */
+/* ---------- video reel: video salvati nel Realtime Database (a pezzi), parte da solo e muto ---------- */
 const vidSrc = u => {
   const x = String(u || "").trim();
-  if (!/\.(mp4|webm|m4v|mov)(\?.*)?$/i.test(x)) return "";
+  if (!/\.(mp4|webm|m4v)(\?.*)?$/i.test(x)) return "";
   if (/^https:\/\//i.test(x)) return x;
   return /^[\w\-./ ]+(\?.*)?$/.test(x) && !x.includes("..") && !/^[a-z]+:/i.test(x) ? x : "";
 };
 let videos = [];
 const calm = matchMedia("(prefers-reduced-motion: reduce)");
+/* scarica i pezzi del video; la cache del browser evita di riscaricarlo alle visite successive */
+async function fetchVideoBlob(d, onProg){
+  const key = "/__cgvid/" + d.fid;
+  try { const c = await caches.open("cg-vids"); const hit = await c.match(key); if (hit) return await hit.blob(); } catch {}
+  const n = Number(d.chunks) || 0, parts = new Array(n); let got = 0, next = 0;
+  async function worker(){
+    while (next < n){
+      const i = next++;
+      const str = (await get(ref(db, `${ROOT}/vfiles/${d.fid}/${i}`))).val();
+      if (typeof str !== "string") throw new Error("missing chunk");
+      const bin = atob(str), u = new Uint8Array(bin.length);
+      for (let k = 0; k < bin.length; k++) u[k] = bin.charCodeAt(k);
+      parts[i] = u; onProg(++got / n);
+    }
+  }
+  await Promise.all([worker(), worker(), worker(), worker()]);
+  const blob = new Blob(parts, { type: d.mime || "video/mp4" });
+  try { const c = await caches.open("cg-vids"); await c.put(key, new Response(blob, { headers: { "Content-Type": blob.type } })); } catch {}
+  return blob;
+}
+function dropBox(box){ box.remove(); if (!$("reel").children.length) $("videos").hidden = true; }
+function ensureVideo(box){
+  if (box._p) return box._p;
+  const v = box.querySelector("video"), d = box._d, lab = box.querySelector(".vload");
+  if (!d.fid){ v.src = d.src; return box._p = Promise.resolve(); }
+  return box._p = fetchVideoBlob(d, p => { if (lab) lab.textContent = "LOADING " + Math.round(p * 100) + "%"; })
+    .then(b => { v.src = URL.createObjectURL(b); lab?.remove(); })
+    .catch(() => dropBox(box));
+}
 const vidObs = "IntersectionObserver" in window ? new IntersectionObserver(es => es.forEach(e => {
   const b = e.target, v = b.querySelector("video");
-  if (e.isIntersecting){ if (!b._up && !calm.matches) v.play().catch(() => {}); } else v.pause();
-}), { threshold: .5 }) : null;
+  if (e.isIntersecting){
+    b._vis = true;
+    ensureVideo(b).then(() => { if (b._vis && !b._up && !calm.matches) v.play().catch(() => {}); });
+  } else { b._vis = false; v.pause(); }
+}), { threshold: .25 }) : null;
 function setupVid(box){
   const v = box.querySelector("video"), pp = box.querySelector('[data-act="pp"]'), mu = box.querySelector('[data-act="mute"]');
   const sync = () => {
@@ -834,9 +867,10 @@ function setupVid(box){
     box.style.aspectRatio = v.videoWidth + " / " + v.videoHeight;
   });
   ["play", "pause", "volumechange"].forEach(ev => v.addEventListener(ev, sync));
-  v.addEventListener("error", () => { box.remove(); if (!$("reel").children.length) $("videos").hidden = true; });
+  v.addEventListener("error", () => { if (v.getAttribute("src")) dropBox(box); });
   pp.addEventListener("click", e => {
     e.stopPropagation();
+    if (!v.getAttribute("src")) return;
     if (v.paused){ box._up = false; v.play().catch(() => {}); } else { box._up = true; v.pause(); }
   });
   v.addEventListener("click", () => pp.click());
@@ -844,25 +878,29 @@ function setupVid(box){
     e.stopPropagation(); v.muted = !v.muted;
     if (!v.muted){
       document.querySelectorAll("#reel video").forEach(o => { if (o !== v) o.muted = true; });
-      if (v.paused){ box._up = false; v.play().catch(() => {}); }
+      if (v.paused && v.getAttribute("src")){ box._up = false; v.play().catch(() => {}); }
     }
   });
   sync();
-  vidObs ? vidObs.observe(box) : (calm.matches || v.play().catch(() => {}));
+  if (vidObs) vidObs.observe(box);
+  else ensureVideo(box).then(() => { if (!calm.matches) v.play().catch(() => {}); });
 }
 function renderVideos(){
   const reel = $("reel");
-  const list = videos.map(v => ({...v, src: vidSrc(v.url)})).filter(v => v.src);
+  const list = videos.map(v => ({...v, src: v.fid ? "" : vidSrc(v.url)})).filter(v => v.fid || v.src);
   $("videos").hidden = !list.length;
   reel.innerHTML = list.map(v => {
     const t = esc(v.title || ""), o = v.orient === "v" || v.orient === "h" ? v.orient : "auto";
-    return `<div class="vid ${o === "v" ? "v" : "h"}" role="listitem" data-o="${o}">
-      <video src="${esc(v.src)}#t=0.1" muted loop playsinline preload="metadata" aria-label="${t || "CraftGlitch video"}"></video>
+    const vert = o === "v" || (o === "auto" && v.w && v.h && v.h > v.w);
+    const ar = v.w && v.h ? ` style="aspect-ratio:${+v.w} / ${+v.h}"` : "";
+    return `<div class="vid ${vert ? "v" : "h"}" role="listitem" data-o="${o}"${ar}>
+      <video muted loop playsinline preload="auto" aria-label="${t || "CraftGlitch video"}"></video>
+      ${v.fid ? `<span class="vload">LOADING…</span>` : ""}
       <span class="chip">▶ CLIP</span>${t ? `<span class="cap">${t}</span>` : ""}
       <div class="ctl"><button type="button" data-act="pp" aria-label="Pause video">❚❚</button><button type="button" data-act="mute" aria-label="Unmute video">🔇</button></div>
     </div>`;
   }).join("");
-  reel.querySelectorAll(".vid").forEach(setupVid);
+  [...reel.querySelectorAll(".vid")].forEach((b, i) => { b._d = list[i]; setupVid(b); });
 }
 onValue(ref(db, ROOT + "/videos"), snap => {
   videos = Object.values(snap.val() || {}).filter(v => v && v.visible !== false).sort((a, b) => (a.order ?? 99) - (b.order ?? 99));
