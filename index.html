@@ -369,6 +369,42 @@ h2{font:700 clamp(32px,4.4vw,48px)/1.05 var(--px);margin:0 0 10px;text-shadow:3p
 @media(max-width:700px){.sup-card{grid-template-columns:1fr;text-align:center;justify-items:center;padding:28px 20px}.amts{justify-content:center}}
 @media (prefers-reduced-motion:reduce){.yt-btn,.yt-btn::after,.yt-btn .ico,.bell,.yt-play,.fp,.cup,.cup i,.nav-yt::before,.addon.premium::before{animation:none}}
 
+/* ---------- VIDEO REEL ---------- */
+.reelsec{padding:56px 0 24px;position:relative}
+.reelsec .kick{display:inline-block;font:600 14px var(--body);letter-spacing:.2em;text-transform:uppercase;color:var(--mag);margin-bottom:8px}
+.reelsec .top-row{display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.reelsec .top-row .sub{margin:0}
+.swipe{font:600 14px var(--px);color:var(--muted);display:none}
+@media(max-width:900px){.swipe{display:block}}
+.reel{display:flex;gap:22px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;align-items:center;padding:14px 6px 26px;scrollbar-width:thin;scrollbar-color:var(--vio) transparent}
+.reel::before,.reel::after{content:"";margin:auto}
+.vid{--c:var(--cyan);flex:none;scroll-snap-align:center;position:relative;background:#000;border:3px solid #000;
+  box-shadow:0 0 0 3px var(--c),0 0 28px color-mix(in srgb,var(--c) 55%,transparent),8px 8px 0 rgba(0,0,0,.55);transition:transform .2s}
+.vid:nth-child(3n+2){--c:var(--mag)}.vid:nth-child(3n+3){--c:var(--vio)}
+.vid:hover{transform:translateY(-6px) rotate(-.6deg)}
+.vid.h{width:min(86vw,520px);aspect-ratio:16/9}
+.vid.v{width:min(62vw,250px);aspect-ratio:9/16}
+.vid .play{position:absolute;inset:0;width:100%;height:100%;padding:0;border:0;background:#000;cursor:pointer;display:block;overflow:hidden;-webkit-tap-highlight-color:transparent}
+.vid .play img{width:100%;height:100%;object-fit:cover;transition:transform .35s,filter .2s;filter:saturate(1.1)}
+.vid:hover .play img{transform:scale(1.07)}
+.vid .play::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 55%,rgba(0,0,0,.85))}
+.vid .pbtn{position:absolute;left:50%;top:50%;z-index:2;width:68px;height:48px;translate:-50% -50%;background:#ff1f2e;border:3px solid #000;
+  box-shadow:inset 0 -5px 0 #9c0d19,inset 0 2px 0 rgba(255,255,255,.35),0 0 24px rgba(255,31,46,.6);animation:ytpulse 2.2s ease-in-out infinite}
+.vid .pbtn::after{content:"";position:absolute;left:50%;top:50%;translate:-35% -50%;border-style:solid;border-width:10px 0 10px 17px;border-color:transparent transparent transparent #fff}
+.vid .chip{position:absolute;left:8px;top:8px;z-index:2;font:700 13px var(--px);background:var(--c);color:#06030f;border:2px solid #000;padding:2px 8px}
+.vid .cap{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:10px 12px;font:700 17px/1.1 var(--px);text-shadow:2px 2px 0 #000;pointer-events:none;text-align:left}
+.vid iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000}
+@media (prefers-reduced-motion:reduce){.vid .pbtn{animation:none}}
+
+/* video mp4 */
+.vid video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000;display:block;cursor:pointer}
+.vid::after{content:"";position:absolute;left:0;right:0;bottom:0;height:40%;background:linear-gradient(transparent,rgba(0,0,0,.82));pointer-events:none;z-index:1}
+.vid .cap{right:104px;padding:10px 12px 12px;z-index:2}
+.vid .ctl{position:absolute;right:8px;bottom:8px;z-index:3;display:flex;gap:6px}
+.vid .ctl button{width:42px;height:42px;display:grid;place-items:center;font:700 15px var(--px);color:#fff;background:rgba(0,0,0,.75);border:2px solid #000;
+  box-shadow:inset 0 -3px 0 rgba(255,255,255,.14),0 0 0 2px var(--c);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.vid .ctl button:hover{background:var(--c);color:#06030f}
+
 /* steps */
 .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;padding:0;margin:0}
 .steps li{list-style:none;padding:26px}
@@ -519,6 +555,20 @@ dialog::backdrop{background:rgba(0,0,0,.72);backdrop-filter:blur(4px)}
       </div>
     </div>
     <div class="ground" aria-hidden="true"></div>
+  </section>
+
+  <section class="reelsec" id="videos" hidden>
+    <div class="wrap">
+      <div class="top-row">
+        <div>
+          <span class="kick">Straight from the channel</span>
+          <h2>See it in action</h2>
+          <p class="sub">Short clips of the add-ons running in Minecraft PE. Tap a video to pause it, or turn the sound on.</p>
+        </div>
+        <span class="swipe">swipe →</span>
+      </div>
+    </div>
+    <div class="wrap"><div class="reel" id="reel" role="list"></div></div>
   </section>
 
   <section class="soon" id="soon" hidden>
@@ -758,6 +808,66 @@ const blockedUntil = id => { const t = reqAt(id); return t && Date.now() - t < C
 const recentCount = () => { try { return JSON.parse(store.get("cg_req_log") || "[]").filter(t => Date.now() - t < BURST_WIN).length; } catch { return 0; } };
 const logReq = () => { let l = []; try { l = JSON.parse(store.get("cg_req_log") || "[]"); } catch {} l = l.filter(t => Date.now() - t < BURST_WIN); l.push(Date.now()); store.set("cg_req_log", JSON.stringify(l)); };
 const fmtDate = t => new Date(t).toLocaleDateString("en-GB", {day: "numeric", month: "long"}) + " at " + new Date(t).toLocaleTimeString("en-GB", {hour: "2-digit", minute: "2-digit"});
+
+/* ---------- video reel (MP4: parte da solo, muto; l'utente puo' pausare o attivare l'audio) ---------- */
+const vidSrc = u => {
+  const x = String(u || "").trim();
+  if (!/\.(mp4|webm|m4v|mov)(\?.*)?$/i.test(x)) return "";
+  if (/^https:\/\//i.test(x)) return x;
+  return /^[\w\-./ ]+(\?.*)?$/.test(x) && !x.includes("..") && !/^[a-z]+:/i.test(x) ? x : "";
+};
+let videos = [];
+const calm = matchMedia("(prefers-reduced-motion: reduce)");
+const vidObs = "IntersectionObserver" in window ? new IntersectionObserver(es => es.forEach(e => {
+  const b = e.target, v = b.querySelector("video");
+  if (e.isIntersecting){ if (!b._up && !calm.matches) v.play().catch(() => {}); } else v.pause();
+}), { threshold: .5 }) : null;
+function setupVid(box){
+  const v = box.querySelector("video"), pp = box.querySelector('[data-act="pp"]'), mu = box.querySelector('[data-act="mute"]');
+  const sync = () => {
+    pp.textContent = v.paused ? "▶" : "❚❚"; pp.setAttribute("aria-label", v.paused ? "Play video" : "Pause video");
+    mu.textContent = v.muted ? "🔇" : "🔊"; mu.setAttribute("aria-label", v.muted ? "Unmute video" : "Mute video");
+  };
+  v.addEventListener("loadedmetadata", () => {
+    if (!v.videoWidth) return;
+    if (box.dataset.o === "auto") box.classList.toggle("v", v.videoHeight > v.videoWidth);
+    box.style.aspectRatio = v.videoWidth + " / " + v.videoHeight;
+  });
+  ["play", "pause", "volumechange"].forEach(ev => v.addEventListener(ev, sync));
+  v.addEventListener("error", () => { box.remove(); if (!$("reel").children.length) $("videos").hidden = true; });
+  pp.addEventListener("click", e => {
+    e.stopPropagation();
+    if (v.paused){ box._up = false; v.play().catch(() => {}); } else { box._up = true; v.pause(); }
+  });
+  v.addEventListener("click", () => pp.click());
+  mu.addEventListener("click", e => {
+    e.stopPropagation(); v.muted = !v.muted;
+    if (!v.muted){
+      document.querySelectorAll("#reel video").forEach(o => { if (o !== v) o.muted = true; });
+      if (v.paused){ box._up = false; v.play().catch(() => {}); }
+    }
+  });
+  sync();
+  vidObs ? vidObs.observe(box) : (calm.matches || v.play().catch(() => {}));
+}
+function renderVideos(){
+  const reel = $("reel");
+  const list = videos.map(v => ({...v, src: vidSrc(v.url)})).filter(v => v.src);
+  $("videos").hidden = !list.length;
+  reel.innerHTML = list.map(v => {
+    const t = esc(v.title || ""), o = v.orient === "v" || v.orient === "h" ? v.orient : "auto";
+    return `<div class="vid ${o === "v" ? "v" : "h"}" role="listitem" data-o="${o}">
+      <video src="${esc(v.src)}#t=0.1" muted loop playsinline preload="metadata" aria-label="${t || "CraftGlitch video"}"></video>
+      <span class="chip">▶ CLIP</span>${t ? `<span class="cap">${t}</span>` : ""}
+      <div class="ctl"><button type="button" data-act="pp" aria-label="Pause video">❚❚</button><button type="button" data-act="mute" aria-label="Unmute video">🔇</button></div>
+    </div>`;
+  }).join("");
+  reel.querySelectorAll(".vid").forEach(setupVid);
+}
+onValue(ref(db, ROOT + "/videos"), snap => {
+  videos = Object.values(snap.val() || {}).filter(v => v && v.visible !== false).sort((a, b) => (a.order ?? 99) - (b.order ?? 99));
+  renderVideos();
+}, () => {});
 
 /* ---------- data ---------- */
 onValue(ref(db, ROOT + "/addons"), snap => {
