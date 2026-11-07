@@ -165,6 +165,23 @@ details.more .in{padding:0 22px 22px}
 .savebar .wrap{display:flex;gap:10px;justify-content:flex-end;align-items:center}
 .savebar .msg{flex:1;color:var(--red);font-size:15px}
 
+
+.vsec{margin-top:34px}
+.vsec h2{font-size:26px;margin-bottom:4px}
+.vsec>p{color:var(--muted);margin:0 0 16px}
+.vrow{display:grid;grid-template-columns:120px 1fr auto;gap:14px;align-items:center;padding:12px;background:var(--panel);border:3px solid #000;border-left:6px solid var(--mag);margin-bottom:10px}
+.vthumb{aspect-ratio:16/9;background:var(--slot) center/cover;border:2px solid #000;display:grid;place-items:center;color:var(--muted);font-size:12px;text-align:center}
+.vthumb video{width:100%;height:100%;object-fit:cover;display:block}
+.vthumb.v{aspect-ratio:9/16;width:68px;justify-self:center}
+.vf{display:grid;gap:8px;min-width:0}
+.vf .two2{display:grid;grid-template-columns:1fr 150px;gap:8px}
+.vf input,.vf select{padding:9px 12px;font:500 16px var(--body)}
+.vf select{width:100%;color:var(--ink);background:var(--slot);border:2px solid var(--line);border-radius:0}
+.vf small{color:var(--muted);font-size:13px}
+.vact{display:flex;flex-direction:column;gap:6px}
+.vbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:6px}
+.vbar .vmsg{color:var(--yellow);font-size:14px}
+@media(max-width:640px){.vrow{grid-template-columns:90px 1fr}.vact{flex-direction:row;grid-column:1/-1}.vf .two2{grid-template-columns:1fr}}
 .toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom,0px));translate:-50% 20px;z-index:60;opacity:0;transition:.25s;pointer-events:none;
   background:var(--green);color:#002b0c;border:2px solid #000;font:700 17px var(--px);padding:12px 20px;max-width:calc(100% - 24px)}
 .toast.bad{background:var(--red);color:#fff}
@@ -214,6 +231,16 @@ details.more .in{padding:0 22px 22px}
       <button class="btn green big" id="addBtn">+ Nuovo addon</button>
     </div>
     <div class="cards" id="cards"><div class="empty"><p>Caricamento…</p></div></div>
+    <section class="vsec" id="vsec">
+      <h2>🎬 Video in alto sul sito</h2>
+      <p>Sul sito partono da soli (senza audio) e chi guarda può metterli in pausa o attivare l'audio. Orizzontali e verticali si adattano da soli. Aggiungi e togli quanti box vuoi (max 12).<br><b>Come inserirli:</b> metti i file .mp4 nella cartella del sito (es. <code>videos/clip1.mp4</code>) e scrivi qui il percorso, oppure incolla un link https diretto al file. I link MediaFire, Drive o YouTube non vanno bene qui. Meglio file leggeri (sotto 5–8 MB, ben compressi).</p>
+      <div id="vrows"></div>
+      <div class="vbar">
+        <button class="btn" type="button" id="vAdd">+ Aggiungi video</button>
+        <button class="btn green" type="button" id="vSave">Salva video</button>
+        <span class="vmsg" id="vMsg"></span>
+      </div>
+    </section>
   </main>
 
   <!-- EDITOR -->
@@ -331,7 +358,7 @@ const app = initializeApp(JSON.parse(atob(_k.join("").split("").reverse().join("
 const db = getDatabase(app);
 const auth = getAuth(app);
 const ROOT = "craftglitch";
-const A = ROOT + "/addons", R = ROOT + "/ratings", M = ROOT + "/media", ADMIN = ROOT + "/admin", D = ROOT + "/downloads";
+const A = ROOT + "/addons", R = ROOT + "/ratings", M = ROOT + "/media", ADMIN = ROOT + "/admin", D = ROOT + "/downloads", V = ROOT + "/videos";
 const MAX_PHOTOS = 8;
 const EMOJIS = ["🧩","🛗","🐾","🤖","🌀","⛏️","📦","🗡️","🏠","🔥","💎","🐉","⚡","🧪","🗺️","🎯"];
 const $ = id => document.getElementById(id);
@@ -440,8 +467,63 @@ function checkUser(user){
     renderList();
   }, err => toast("Errore nel leggere gli addon", true)));
   unsubs.push(onValue(ref(db, R), snap => { ratings = snap.val() || {}; renderList(); }));
+  unsubs.push(onValue(ref(db, V), snap => { if (!vDirty){ vids = Object.entries(snap.val() || {}).map(([id, v]) => ({id, url: v.url || "", title: v.title || "", orient: v.orient || "auto", order: v.order ?? 99})).sort((x, y) => x.order - y.order); renderVids(); } }, () => {}));
   unsubs.push(onValue(ref(db, D), snap => { downloads = snap.val() || {}; renderList(); }, () => {}));
 }
+
+
+/* =================== VIDEO IN ALTO =================== */
+let vids = [], vDirty = false;
+const vidSrc = u => {
+  const x = String(u || "").trim();
+  if (!/\.(mp4|webm|m4v|mov)(\?.*)?$/i.test(x)) return "";
+  if (/^https:\/\//i.test(x)) return x;
+  return /^[\w\-./ ]+(\?.*)?$/.test(x) && !x.includes("..") && !/^[a-z]+:/i.test(x) ? x : "";
+};
+function vMark(){ vDirty = true; $("vMsg").textContent = "Modifiche non salvate"; }
+function renderVids(){
+  $("vrows").innerHTML = vids.length ? vids.map((v, i) => {
+    const src = vidSrc(v.url);
+    return `<div class="vrow" data-i="${i}">
+      <div class="vthumb ${v.orient === "v" ? "v" : ""}">${src ? `<video src="${esc(src)}#t=0.1" muted playsinline preload="metadata"></video>` : "Anteprima"}</div>
+      <div class="vf">
+        <input data-f="url" type="text" inputmode="url" placeholder="videos/clip1.mp4  oppure  https://…/clip.mp4" value="${esc(v.url)}" aria-label="File video ${i + 1}">
+        <div class="two2"><input data-f="title" maxlength="50" placeholder="Titolo (facoltativo)" value="${esc(v.title)}" aria-label="Titolo video ${i + 1}">
+          <select data-f="orient" aria-label="Formato"><option value="auto"${v.orient === "auto" ? " selected" : ""}>Formato: auto</option><option value="h"${v.orient === "h" ? " selected" : ""}>Orizzontale</option><option value="v"${v.orient === "v" ? " selected" : ""}>Verticale</option></select></div>
+        ${v.url.trim() && !src ? '<small style="color:var(--red)">Serve un file .mp4 (o .webm): percorso del sito o link https diretto.</small>' : ""}
+      </div>
+      <div class="vact"><button class="iconbtn" type="button" data-a="up" ${i === 0 ? "disabled" : ""} aria-label="Sposta su">↑</button><button class="iconbtn" type="button" data-a="dn" ${i === vids.length - 1 ? "disabled" : ""} aria-label="Sposta giù">↓</button><button class="iconbtn del" type="button" data-a="del" aria-label="Elimina">✕</button></div>
+    </div>`;
+  }).join("") : '<div class="empty" style="padding:26px"><p style="margin:0">Nessun video: la sezione non compare sul sito.</p></div>';
+}
+$("vrows").addEventListener("input", e => {
+  const row = e.target.closest(".vrow"), f = e.target.dataset.f; if (!row || !f) return;
+  vids[+row.dataset.i][f] = e.target.value; vMark();
+});
+$("vrows").addEventListener("change", e => { if (e.target.dataset.f && e.target.dataset.f !== "title") renderVids(); });
+$("vrows").addEventListener("click", e => {
+  const b = e.target.closest("[data-a]"); if (!b) return;
+  const i = +b.closest(".vrow").dataset.i;
+  if (b.dataset.a === "del") vids.splice(i, 1);
+  else { const j = b.dataset.a === "up" ? i - 1 : i + 1; [vids[i], vids[j]] = [vids[j], vids[i]]; }
+  vMark(); renderVids();
+});
+$("vAdd").addEventListener("click", () => {
+  if (vids.length >= 12) return toast("Massimo 12 video", true);
+  vids.push({id: "n" + Date.now(), url: "", title: "", orient: "auto"}); vMark(); renderVids();
+  $("vrows").querySelector(".vrow:last-child [data-f=url]")?.focus();
+});
+$("vSave").addEventListener("click", async () => {
+  const list = vids.filter(v => v.url.trim());
+  if (list.some(v => !vidSrc(v.url))) return toast("Un file non è valido: serve un .mp4", true);
+  const btn = $("vSave"); btn.disabled = true;
+  try {
+    const obj = {}; list.forEach((v, i) => { obj[push(ref(db, V)).key] = {url: v.url.trim(), title: v.title.trim(), orient: v.orient || "auto", order: i, visible: true}; });
+    await set(ref(db, V), list.length ? obj : null);
+    vDirty = false; $("vMsg").textContent = ""; toast("Video salvati!");
+  } catch (err) { toast(errMsg(err), true); }
+  btn.disabled = false;
+});
 
 /* =================== LISTA =================== */
 function rstats(id){ const r = Object.values(ratings[id] || {}).map(x => +x.s).filter(Boolean); return {n: r.length, avg: r.length ? r.reduce((a, b) => a + b, 0) / r.length : 0}; }
