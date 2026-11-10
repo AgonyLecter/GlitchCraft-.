@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="it"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#052a1c">
+<title>Furio</title>
+<style>
+:root{--bg:#052a1c;--card:#0a3a28;--card2:#0d4a33;--line:#ffffff1f;--tx:#fff;--mut:#ffffffa6;--gold:#f7c948;--red:#ff6b6b;--grn:#7dffb0}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font:15px/1.4 Poppins,system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;border:0;border-radius:10px;padding:9px 16px;font-weight:600;background:var(--gold);color:#3a2a00}
+button.s{background:#ffffff1f;color:#fff}
+button.r{background:var(--red);color:#2a0000}
+button.g{background:var(--grn);color:#023a1c}
+button:disabled{opacity:.5;cursor:default}
+input,select{background:#00000040;border:1px solid var(--line);border-radius:10px;padding:9px 12px;min-width:0}
+select option{background:#0a3a28;color:#fff}
+.hide{display:none!important}
+
+/* login */
+#login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.lbox{background:var(--card);border:2px solid var(--gold);border-radius:22px;padding:26px 22px;width:100%;max-width:360px;text-align:center}
+.lbox h1{margin:0 0 4px;font-size:24px}
+.lbox p{margin:0 0 16px;color:var(--mut);font-size:13px}
+.lbox input{width:100%;margin-bottom:10px}
+.lbox button{width:100%;margin-top:4px}
+.err{color:var(--red);min-height:20px;font-size:13px;margin:6px 0 0}
+
+/* dashboard */
+#dash{max-width:1100px;margin:0 auto;padding:16px 14px 60px}
+header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+header h1{margin:0;font-size:22px;flex:1}
+header small{color:var(--mut)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.st{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.st b{display:block;font-size:24px;line-height:1.1}
+.st span{color:var(--mut);font-size:12px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.bar input{flex:1 1 200px}
+.warn{background:#ff6b6b22;border:1px solid var(--red);border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:13px}
+
+table{width:100%;border-collapse:collapse;background:var(--card);border-radius:14px;overflow:hidden}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-size:12px;color:var(--mut);font-weight:600;text-transform:uppercase;letter-spacing:.04em;background:var(--card2)}
+tr:last-child td{border-bottom:0}
+.pl{display:flex;align-items:center;gap:10px;min-width:0}
+.av{width:38px;height:38px;border-radius:50%;background:#ffffff1f;display:flex;align-items:center;justify-content:center;font-size:21px;flex:none}
+.nm{font-weight:600;word-break:break-word}
+.nm small{display:block;font-weight:400;color:var(--mut);font-size:12px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#888;margin-right:6px}
+.dot.on{background:var(--grn);box-shadow:0 0 6px var(--grn)}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:6px;vertical-align:middle}
+.tag.ban{background:var(--red);color:#2a0000}
+tr.banned td{background:#ff6b6b14}
+tr.banned .nm{opacity:.75}
+.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.empty{padding:30px;text-align:center;color:var(--mut)}
+.reason{color:var(--red);font-size:12px;font-weight:400}
+
+@media(max-width:760px){
+ thead{display:none}
+ table,tbody,tr,td{display:block;width:100%}
+ table{background:none}
+ tr{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:10px;padding:6px 4px}
+ td{border:0;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:6px 10px}
+ td::before{content:attr(data-l);color:var(--mut);font-size:12px;flex:none}
+ td.first::before{display:none}
+ tr.banned td{background:none}
+ tr.banned{background:#3a1a1a}
+}
+
+dialog{background:var(--card);color:var(--tx);border:2px solid var(--red);border-radius:18px;padding:20px;max-width:380px;width:92%}
+dialog::backdrop{background:#000b}
+dialog h3{margin:0 0 6px}
+dialog p{margin:0 0 12px;color:var(--mut);font-size:13px}
+dialog input{width:100%;margin-bottom:12px}
+.row{display:flex;gap:8px;justify-content:flex-end}
+#toast{position:fixed;top:14px;left:50%;transform:translateX(-50%);background:#000d;border:2px solid var(--gold);padding:9px 20px;border-radius:30px;font-weight:600;z-index:50;max-width:92vw}
+</style></head><body>
+
+<!-- ACCESSO -->
+<div id="login">
+ <form class="lbox" id="lf">
+  <h1>🔒 Furio</h1>
+  <p id="lp">Area riservata</p>
+  <input type="email" id="em" placeholder="Email" autocomplete="username" required>
+  <input type="password" id="pw" placeholder="Password (min. 6 caratteri)" autocomplete="current-password" minlength="6" required>
+  <button type="submit" id="lb">Entra</button>
+  <div class="err" id="le"></div>
+ </form>
+</div>
+
+<!-- PANNELLO -->
+<div id="dash" class="hide">
+ <header>
+  <h1>Pannello giocatori</h1>
+  <small id="who"></small>
+  <button class="s" id="out">Esci</button>
+ </header>
+ <div id="warn"></div>
+ <div class="stats" id="stats"></div>
+ <div class="bar">
+  <input type="search" id="q" placeholder="Cerca nickname…">
+  <select id="fil">
+   <option value="all">Tutti</option><option value="creator">Creatori</option><option value="admin">Admin</option>
+   <option value="user">Utenti</option><option value="online">Online</option><option value="banned">Bannati</option>
+  </select>
+  <select id="srt">
+   <option value="new">Più recenti</option><option value="name">Nome A–Z</option><option value="time">Ore di gioco</option>
+   <option value="coins">Monete</option><option value="games">Partite</option>
+  </select>
+ </div>
+ <table>
+  <thead><tr><th>Giocatore</th><th>Ruolo</th><th>Ore di gioco</th><th>Monete</th><th>Vittorie / Partite</th><th>Iscritto</th><th></th></tr></thead>
+  <tbody id="tb"></tbody>
+ </table>
+</div>
+
+<dialog id="bm">
+ <h3>🚫 Banna <span id="bn"></span></h3>
+ <p>Il giocatore vedrà una schermata di blocco e sparirà dalla classifica.</p>
+ <input id="br" placeholder="Motivo (facoltativo)" maxlength="120">
+ <div class="row"><button class="s" id="bx">Annulla</button><button class="r" id="bok">Banna</button></div>
+</dialog>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+firebase.initializeApp({apiKey:"AIzaSyA49iSn7qBR7TaL9q4l8X1a0HmFOaudtxs",authDomain:"thcvault-6a800.firebaseapp.com",
+ databaseURL:"https://thcvault-6a800-default-rtdb.europe-west1.firebasedatabase.app",projectId:"thcvault-6a800",
+ storageBucket:"thcvault-6a800.appspot.com",messagingSenderId:"746310807606",appId:"1:746310807606:web:20ccf6ea569cbf68f0a897"});
+const db=firebase.database(),auth=firebase.auth(),TS=firebase.database.ServerValue.TIMESTAMP;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+const D={users:{},bans:{},roles:{},pt:{}},errs={};
+let refs=[],q='',fil='all',srt='new',raf=0,banId='';
+
+/* ---------- accesso ----------
+   admin/ contiene l'uid dell'unico admin. Finché è vuoto, il primo account creato da questa pagina se lo prende
+   (le regole Firebase impediscono di riscriverlo dopo). Poi entra solo quell'uid. */
+let adminUid,busy=false,attached=false;
+const AE={'auth/invalid-credential':'Email o password errata','auth/wrong-password':'Email o password errata','auth/user-not-found':'Email o password errata',
+ 'auth/email-already-in-use':'Email già registrata: accedi invece di crearla','auth/weak-password':'Password troppo corta (min. 6)',
+ 'auth/too-many-requests':'Troppi tentativi, riprova tra poco','auth/operation-not-allowed':'Attiva Email/Password in Firebase → Authentication','auth/network-request-failed':'Errore di rete'};
+$('#lf').onsubmit=async e=>{
+ e.preventDefault();$('#le').textContent='';$('#lb').disabled=true;busy=true;
+ const em=$('#em').value.trim(),pw=$('#pw').value;
+ try{
+  if(adminUid===null){
+   const c=await auth.createUserWithEmailAndPassword(em,pw);
+   try{await db.ref('admin').set(c.user.uid)}
+   catch(x){await c.user.delete().catch(()=>{});throw {message:'Un admin è già stato impostato'}}
+  }else await auth.signInWithEmailAndPassword(em,pw);
+ }catch(x){$('#le').textContent=AE[x.code]||('Errore: '+(x.code||x.message))}
+ busy=false;$('#lb').disabled=false;gate();
+};
+$('#out').onclick=()=>auth.signOut();
+db.ref('admin').on('value',s=>{adminUid=s.val()||null;
+ $('#lp').textContent=adminUid===null?'Prima configurazione: l’account che crei ora diventa l’unico admin':'Area riservata';
+ $('#lb').textContent=adminUid===null?'Crea admin':'Entra';gate()},
+ e=>{$('#le').textContent='Impossibile leggere admin/: aggiungi le regole Firebase'});
+auth.onAuthStateChanged(()=>gate());
+function gate(){
+ const u=auth.currentUser;if(adminUid===undefined)return;
+ const ok=!!u&&u.uid===adminUid;
+ $('#login').classList.toggle('hide',ok);$('#dash').classList.toggle('hide',!ok);
+ if(!ok){
+  refs.forEach(r=>r.off());refs=[];attached=false;
+  if(u&&!busy&&adminUid!==null){$('#le').textContent='Questo account non è l’admin';auth.signOut()}
+  return;
+ }
+ if(attached)return;attached=true;
+ $('#who').textContent=u.email;
+ const on=(k,path)=>{const r=db.ref(path);refs.push(r);
+  r.on('value',s=>{D[k]=s.val()||{};delete errs[k];paint()},e=>{errs[k]=e.code||e.message;paint()})};
+ on('users','users');on('bans','bans');on('roles','roles');on('pt','playtime');
+}
+
+/* ---------- dati ---------- */
+const roleOf=(id,u)=>u.cr?'creator':D.roles[id]==='admin'?'admin':'user';
+const RN={creator:'⚜️ Creatore',admin:'🛡️ Admin',user:'👤 Utente'};
+const fmtT=s=>{s=Math.round(s||0);const h=Math.floor(s/3600),m=Math.floor(s%3600/60);return h?h+'h '+String(m).padStart(2,'0')+'m':m+'m'};
+const fmtD=t=>t?new Date(t).toLocaleDateString('it-IT',{day:'2-digit',month:'short',year:'numeric'}):'—';
+const fmtS=t=>t?new Date(t).toLocaleString('it-IT',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'';
+const avOf=a=>!a?'🙂':/[\uE000-\uF8FF]/.test(a)?'⚜️':a;
+const rows=()=>Object.entries(D.users).filter(([,u])=>u&&u.n).map(([id,u])=>({
+ id,n:u.n,av:avOf(u.av),c:u.c||0,w:u.w||0,g:u.g||0,pkb:u.pkb||0,t:u.t||0,on:u.on===true,seen:u.seen||0,
+ pt:+D.pt[id]||0,role:roleOf(id,u),ban:D.bans[id]||null}));
+
+function paint(){cancelAnimationFrame(raf);raf=requestAnimationFrame(draw)}
+function draw(){
+ const all=rows();
+ const warn=Object.entries(errs).map(([k,c])=>`<div class="warn">⚠️ Lettura di <b>${esc({users:'users',bans:'bans',roles:'roles',pt:'playtime'}[k])}</b> negata (${esc(c)}). Controlla le regole Firebase.</div>`).join('');
+ $('#warn').innerHTML=warn;
+ const tot=all.reduce((a,r)=>({pt:a.pt+r.pt,c:a.c+r.c}),{pt:0,c:0});
+ $('#stats').innerHTML=[
+  [all.length,'Iscritti'],[all.filter(r=>r.on).length,'Online ora'],[all.filter(r=>r.ban).length,'Bannati'],
+  [Math.round(tot.pt/360)/10+' h','Ore di gioco totali'],['🪙 '+tot.c.toLocaleString('it-IT'),'Monete in circolo']
+ ].map(([v,l])=>`<div class="st"><b>${v}</b><span>${l}</span></div>`).join('');
+
+ let l=all.filter(r=>{
+  if(q&&!r.n.toLowerCase().includes(q))return false;
+  if(fil==='banned')return !!r.ban;
+  if(fil==='online')return r.on;
+  return fil==='all'||r.role===fil;
+ });
+ const S={new:(a,b)=>b.t-a.t,name:(a,b)=>a.n.localeCompare(b.n,'it'),time:(a,b)=>b.pt-a.pt,coins:(a,b)=>b.c-a.c,games:(a,b)=>b.g-a.g};
+ l.sort(S[srt]);
+ $('#tb').innerHTML=l.length?l.map(r=>`<tr class="${r.ban?'banned':''}">
+  <td class="first"><div class="pl"><div class="av">${esc(r.av)}</div>
+   <div class="nm"><span class="dot ${r.on?'on':''}"></span>${esc(r.n)}${r.ban?'<span class="tag ban">BANNATO</span>':''}
+   <small>${r.on?'online':r.seen?'visto '+fmtS(r.seen):'mai visto'}</small>
+   ${r.ban&&r.ban.r?`<span class="reason">${esc(r.ban.r)}</span>`:''}</div></div></td>
+  <td data-l="Ruolo"><select data-role="${esc(r.id)}">${Object.entries(RN).map(([k,v])=>`<option value="${k}"${k===r.role?' selected':''}>${v}</option>`).join('')}</select></td>
+  <td data-l="Ore di gioco" class="num">${fmtT(r.pt)}</td>
+  <td data-l="Monete" class="num">🪙 ${r.c.toLocaleString('it-IT')}${r.pkb?`<br><small style="color:var(--mut)">fiches ${r.pkb.toLocaleString('it-IT')}</small>`:''}</td>
+  <td data-l="Vittorie / Partite" class="num">🏆 ${r.w} / 🎴 ${r.g}</td>
+  <td data-l="Iscritto" class="num">${fmtD(r.t)}</td>
+  <td>${r.ban?`<button class="g" data-unban="${esc(r.id)}">Sbanna</button>`:`<button class="r" data-ban="${esc(r.id)}">Banna</button>`}</td>
+ </tr>`).join(''):`<tr><td colspan="7" class="empty">Nessun giocatore trovato</td></tr>`;
+}
+
+/* ---------- filtri ---------- */
+$('#q').oninput=e=>{q=e.target.value.trim().toLowerCase();paint()};
+$('#fil').onchange=e=>{fil=e.target.value;paint()};
+$('#srt').onchange=e=>{srt=e.target.value;paint()};
+
+/* ---------- azioni ---------- */
+function toast(m){let t=$('#toast');t&&t.remove();t=document.createElement('div');t.id='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2600)}
+const fail=e=>toast('❌ '+(e.code==='PERMISSION_DENIED'?'Permesso negato: controlla le regole':(e.message||'Errore')));
+
+$('#tb').addEventListener('change',async e=>{
+ const id=e.target.dataset.role;if(!id)return;
+ const v=e.target.value,u=D.users[id]||{};
+ const upd={};
+ upd['users/'+id+'/cr']=v==='creator'?1:null;
+ upd['roles/'+id]=v==='admin'?'admin':null;
+ try{await db.ref().update(upd);toast('✅ '+u.n+' → '+RN[v].replace(/^\S+\s/,''))}catch(x){fail(x);paint()}
+});
+$('#tb').addEventListener('click',async e=>{
+ const b=e.target.closest('button');if(!b)return;
+ if(b.dataset.ban){banId=b.dataset.ban;$('#bn').textContent=(D.users[banId]||{}).n||'';$('#br').value='';$('#bm').showModal();$('#br').focus()}
+ if(b.dataset.unban){
+  const id=b.dataset.unban;if(!confirm('Sbannare '+((D.users[id]||{}).n||'questo giocatore')+'?'))return;
+  try{await db.ref('bans/'+id).remove();toast('✅ Giocatore sbannato')}catch(x){fail(x)}
+ }
+});
+$('#bx').onclick=()=>$('#bm').close();
+$('#bok').onclick=async()=>{
+ const id=banId,r=$('#br').value.trim();$('#bok').disabled=true;
+ try{
+  await db.ref('bans/'+id).set({t:TS,r,by:auth.currentUser.email});
+  try{await db.ref('lb/'+id).remove()}catch(x){}   /* via dalla classifica pubblica */
+  toast('🚫 Giocatore bannato');
+ }catch(x){fail(x)}
+ $('#bok').disabled=false;$('#bm').close();
+};
+</script>
+</body></html>
